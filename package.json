@@ -1,26 +1,26 @@
 {
-  "name": "com.3d-group.unity-package-template",
-  "displayName": "3D Group - Unity package template",
-  "version": "1.1.3",
-  "description": "Template for creating Unity game engine packages",
-  "dependencies": {},
+  "name": "com.sensengames.unity-lnx-arch",
+  "displayName": "Sensen Games - Lnx Arch",
+  "version": "0.0.0",
+  "unity": "2021.3",
+  "description": "Make your Unity project cleaner and more modular with those features inspired by Dependency Injection solutions and Scriptable Objects Architecture.",
   "keywords": [
     "unity",
-    "unity3d",
-    "upm",
-    "3d-group",
+	"unity3d",
+	"upm",
+    "sensengames",
     "utility"
   ],
-  "homepage": "https://github.com/3d-group/unity-package-template.git",
+  "homepage": "https://github.com/sensengames/unity-lnx-arch.git",
   "bugs": {
-    "url": "https://github.com/3d-group/unity-package-template/issues"
+    "url": "https://github.com/sensengames/unity-lnx-arch/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/3d-group/unity-package-template.git"
+    "url": "git+ssh://git@github.com/sensengames/unity-lnx-arch.git"
   },
   "license": "MIT",
-  "author": "3D Group (https://3d.fi/)",
+  "author": "Sensen Games (https://sensengames.com)",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   }

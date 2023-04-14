@@ -1,0 +1,11 @@
+{
+  "name": "Unity.com.sensengames.unity-lnx-arch.Editor.Tests",
+  "references": [
+    "Unity.com.sensengames.unity-lnx-arch"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}
