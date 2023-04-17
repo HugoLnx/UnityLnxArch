@@ -1,5 +1,6 @@
 {
-    "name": "Unity.com.sensengames.unity-lnx-arch",
+    "name": "Sensen-LnxArch",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
