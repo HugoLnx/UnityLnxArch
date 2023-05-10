@@ -47,6 +47,11 @@ namespace LnxArch
                 .Distinct();
         }
 
+        public override string ToString()
+        {
+            return $"AutofetchType-{Type} {Priority}";
+        }
+
         private static IEnumerable<AutofetchMethod> GetAutoFetchMethodsOf(Type type)
         {
             return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
