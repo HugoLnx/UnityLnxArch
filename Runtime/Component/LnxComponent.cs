@@ -10,12 +10,14 @@ namespace LnxArch
         public event WriteCallback<T> OnWrite;
         private System.Func<T> ReadOverwrite;
 
-        protected virtual T PlainValue {
+        public virtual T PlainValue
+        {
             get => _value;
             set => _value = value;
         }
 
-        public override T Value {
+        public override T Value
+        {
             get => Read();
             set => Write(value);
         }
@@ -27,7 +29,7 @@ namespace LnxArch
 
         public void Write(T value, LnxComponentSource<T> source = default, bool skipCallbacks = false)
         {
-            if ((object) source.Component == this) return;
+            if (System.Object.ReferenceEquals(source.Component, this)) return;
             T oldValue = PlainValue;
             PlainValue = value;
 

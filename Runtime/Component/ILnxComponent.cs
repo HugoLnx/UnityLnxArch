@@ -4,6 +4,7 @@ namespace LnxArch
     {
         public ILnxComponent<T> Component;
         public ILnxComponent<T> Channel;
+        public object Object;
     }
     public delegate void ChangeCallback<T>(T oldValue, T newValue, LnxComponentSource<T> source);
     public delegate void WriteCallback<T>(T value, LnxComponentSource<T> source);
