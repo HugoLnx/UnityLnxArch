@@ -30,7 +30,7 @@ namespace LnxArch
         public void DoBreadthFirstTraversalForEachParentlessNode(System.Action<T, int> visit)
         {
             if (_nodes.Count == 0) return;
-            IEnumerable<DependencyNode<T>> parentlessNodes = 
+            IEnumerable<DependencyNode<T>> parentlessNodes =
                 _nodes
                 .Values
                 .Where(n => !n.Dependents.Any());
@@ -124,9 +124,10 @@ namespace LnxArch
                 (DependencyNode<T> node, int depth) = visitData;
                 if (visited.Contains(node))
                 {
-                    string trackStr = string.Join("\n", visitData.BackTrack().Reverse());
-                    UnityEngine.Debug.LogError($"LnxArch circular dependency: \n{trackStr}");
-                    throw new LnxCircularDependencyException();
+                    continue;
+                    // string trackStr = string.Join("\n", visitData.BackTrack().Reverse());
+                    // UnityEngine.Debug.LogError($"LnxArch circular dependency: \n{trackStr}");
+                    // throw new LnxCircularDependencyException();
                 }
 
                 visit(node.Key, depth);
