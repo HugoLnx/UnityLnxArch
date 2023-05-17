@@ -28,15 +28,25 @@ namespace LnxArch
             }
         }
 
-        public T FetchFirst<T>(bool includeInactive = DefaultIncludeInactive)
+        public T FetchFirst<T>(bool includeInactive = DefaultIncludeInactive, bool canBeNull = true)
         where T : class
         {
-            return GetComponentInChildren<T>(includeInactive);
+            T component = GetComponentInChildren<T>(includeInactive);
+            if (component == null && !canBeNull)
+            {
+                throw new LnxComponentNotFound(typeof(T), this);
+            }
+            return component;
         }
 
-        public Component FetchFirst(Type type, bool includeInactive = DefaultIncludeInactive)
+        public Component FetchFirst(Type type, bool includeInactive = DefaultIncludeInactive, bool canBeNull = true)
         {
-            return GetComponentInChildren(type, includeInactive);
+            Component component = GetComponentInChildren(type, includeInactive);
+            if (component == null && !canBeNull)
+            {
+                throw new LnxComponentNotFound(type, this);
+            }
+            return component;
         }
 
         public T[] FetchAll<T>(bool includeInactive = DefaultIncludeInactive)
@@ -48,6 +58,21 @@ namespace LnxArch
         public Component[] FetchAll(Type type, bool includeInactive = DefaultIncludeInactive)
         {
             return GetComponentsInChildren(type, includeInactive);
+        }
+
+        public static LnxEntity FetchEntityOf(Component component, bool canBeNull = true)
+        {
+            LnxEntity entity = component.GetComponentInParent<LnxEntity>(includeInactive: true);
+            if (entity == null && !canBeNull)
+            {
+                throw new LnxEntityNotFound(component);
+            }
+            return entity;
+        }
+
+        public static LnxEntity FetchEntityParentOf(LnxEntity entity)
+        {
+            return LnxEntity.FetchEntityOf(entity.transform.parent);
         }
     }
 }

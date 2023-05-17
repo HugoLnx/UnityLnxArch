@@ -15,28 +15,28 @@ namespace LnxArch
         public LnxEntity Entity => _entity ??= LnxEntityLookup(this);
         public LnxEntity ParentEntity => ParentLnxEntityLookup(this);
 
-        public static LnxEntity GetLnxEntity(MonoBehaviour behaviour)
+        public static LnxEntity GetLnxEntity(Component component)
         {
-            LnxBehaviour lnxBehaviour = behaviour as LnxBehaviour;
-            return lnxBehaviour?.Entity ?? LnxEntityLookup(behaviour);
+            LnxBehaviour lnxBehaviour = component as LnxBehaviour;
+            return lnxBehaviour?.Entity ?? LnxEntityLookup(component);
         }
 
-        public static LnxEntity GetParentLnxEntity(MonoBehaviour behaviour)
+        public static LnxEntity GetParentLnxEntity(Component component)
         {
-            return ParentLnxEntityLookup(behaviour);
+            return ParentLnxEntityLookup(component);
         }
 
-        private static LnxEntity LnxEntityLookup(MonoBehaviour behaviour)
+        private static LnxEntity LnxEntityLookup(Component component)
         {
-            LnxEntity entity = behaviour.GetComponentInParent<LnxEntity>(includeInactive: true);
-            Assert.IsNotNull(entity, $"{behaviour.GetType().Name} must be inside a LnxEntity to be a LnxBehaviour or have an Autofetch method.");
+            LnxEntity entity = LnxEntity.FetchEntityOf(component);
+            Assert.IsNotNull(entity, $"{component.GetType().Name} must be inside a LnxEntity to be a LnxBehaviour or have an Autofetch method.");
             return entity;
         }
 
-        private static LnxEntity ParentLnxEntityLookup(MonoBehaviour behaviour)
+        private static LnxEntity ParentLnxEntityLookup(Component component)
         {
-            LnxEntity ownerEntity = GetLnxEntity(behaviour);
-            return ownerEntity.transform.parent.GetComponentInParent<LnxEntity>(includeInactive: true);
+            LnxEntity ownerEntity = GetLnxEntity(component);
+            return LnxEntity.FetchEntityParentOf(ownerEntity);
         }
 
     }
