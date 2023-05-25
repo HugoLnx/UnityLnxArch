@@ -1,5 +1,5 @@
 {
-    "name": "Sensen-LnxArch",
+    "name": "Sensen.LnxArch.Runtime",
     "rootNamespace": "",
     "references": [],
     "includePlatforms": [],

@@ -1,7 +1,7 @@
 {
-  "name": "Unity.com.sensengames.unity-lnx-arch.Editor.Tests",
+  "name": "Sensen.LnxArch.Runtime.Tests",
   "references": [
-    "Unity.com.sensengames.unity-lnx-arch"
+    "Sensen.LnxArch.Runtime"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"
