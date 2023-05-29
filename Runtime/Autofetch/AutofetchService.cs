@@ -15,8 +15,7 @@ namespace LnxArch
         public static void StartAutofetchChainAt(GameObject gameObject)
         {
             LnxEntity rootEntity = gameObject.GetComponentsInParent<LnxEntity>(includeInactive: true)
-                .Where(entity => !entity.WasAutofetched)
-                .LastOrDefault();
+                .LastOrDefault(entity => !entity.WasAutofetched);
             GameObject chainRoot = rootEntity?.gameObject ?? gameObject;
             AutofetchChildrenOf(gameObject);
         }
@@ -49,8 +48,7 @@ namespace LnxArch
                 .Select(entity =>
                     entity
                     .GetComponentsInParent<LnxEntity>(includeInactive: true)
-                    .Where(entity => pendingEntities.Contains(entity))
-                    .Last()
+                    .Last(entity => pendingEntities.Contains(entity))
                 )
                 .Distinct();
 
@@ -60,7 +58,7 @@ namespace LnxArch
                 .Distinct();
 
             AutofetchBehaviours(pendingBehaviours);
-            
+
             foreach (LnxEntity pendingEntity in pendingEntities)
             {
                 pendingEntity.WasAutofetched = true;
@@ -69,11 +67,13 @@ namespace LnxArch
 
         private static void AutofetchBehaviours(IEnumerable<MonoBehaviour> allBehaviours)
         {
-            AutofetchExecutor executor = new();
-            IEnumerable<(MonoBehaviour, AutofetchType)> behaviours =
-                DependencyResolver.Instance.FilterAutofetchBehavioursAndOrderForCalling(allBehaviours);
-            foreach ((MonoBehaviour behaviour, AutofetchType type) in behaviours)
+            AutofetchExecutor executor = AutofetchExecutor.Instance;
+            TypesPreProcessor typesPreProcessor = TypesPreProcessor.Instance;
+
+            foreach (MonoBehaviour behaviour in allBehaviours)
             {
+                AutofetchType type = typesPreProcessor.GetAutofetchType(behaviour.GetType());
+                if (type == null) continue;
                 executor.ExecuteAutofetchOn(behaviour, type);
             }
         }

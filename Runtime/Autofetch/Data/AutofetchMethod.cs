@@ -12,11 +12,14 @@ namespace LnxArch
         public AutofetchAttribute AutofetchAttribute { get; }
         public AutofetchParameter[] Parameters { get; }
 
+        private readonly object[] _valuesBuffer;
+
         public AutofetchMethod(MethodInfo method, AutofetchAttribute autofetchAttribute, AutofetchParameter[] parameters)
         {
             Info = method;
             AutofetchAttribute = autofetchAttribute;
             Parameters = parameters;
+            _valuesBuffer = new object[parameters.Length];
         }
 
         public static AutofetchMethod BuildFrom(MethodInfo method)
@@ -38,12 +41,12 @@ namespace LnxArch
 
         public void InvokeWithResolvedParameters(MonoBehaviour behaviour, Func<AutofetchParameter, object> resolveParameter)
         {
-            object[] resolvedParameters = this
-                .Parameters
-                .Select(param => resolveParameter(param))
-                .ToArray();
+            foreach (AutofetchParameter param in this.Parameters)
+            {
+                _valuesBuffer[param.Info.Position] = resolveParameter(param);
+            }
 
-            this.Info.Invoke(behaviour, resolvedParameters);
+            this.Info.Invoke(behaviour, _valuesBuffer);
         }
     }
 }

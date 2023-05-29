@@ -8,8 +8,10 @@ using UnityEngine.Assertions;
 
 namespace LnxArch
 {
-    public class AutofetchExecutor
+    public sealed class AutofetchExecutor
     {
+        public static AutofetchExecutor Instance { get; } = new AutofetchExecutor();
+        private AutofetchExecutor() { }
         public void ExecuteAutofetchOn(MonoBehaviour behaviour, AutofetchType type)
         {
             LnxEntity entity = LnxBehaviour.GetLnxEntity(behaviour);
@@ -30,7 +32,7 @@ namespace LnxArch
                 if (fetched != null) break;
             }
 
-            Debug.Log($"[Fetched:{behaviour.GetType().Name}] {param.Type.Name} {param.Info.Name} = {fetched?.GetType()}");
+            // Debug.Log($"[Fetched:{behaviour.GetType().Name}] {param.Type.Name} {param.Info.Name} = {fetched?.GetType()}");
             if (!param.Info.HasDefaultValue)
             {
                 string errorPrefix = $"[LnxArch:AutoFetch:{behaviour.GetType().Name}#{method.Info.Name}({param.Type.Name} {param.Info.Name})]";
@@ -38,9 +40,6 @@ namespace LnxArch
                     !typeof(IEnumerable<>).IsAssignableFrom(param.Type)
                     || param.HasValidCollectionWrap,
                     $"{errorPrefix} Only types derived from Component, Component[] or List<Component> can be auto fetched.");
-                //Assert.IsTrue(
-                //    typeof(Component).IsAssignableFrom(fetchType),
-                //    $"{errorPrefix} {fetchType} doesn't inherits Component.");
                 Assert.IsNotNull(fetched,
                     $"{errorPrefix} Could not fulfill that dependency");
             }
