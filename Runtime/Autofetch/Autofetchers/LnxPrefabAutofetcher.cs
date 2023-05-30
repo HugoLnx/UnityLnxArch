@@ -9,7 +9,7 @@ namespace LnxArch
     {
         private void Awake()
         {
-            AutofetchService.StartAutofetchChainAt(this.gameObject);
+            AutofetchService.Instance.StartAutofetchChainAt(this.gameObject);
         }
     }
 }

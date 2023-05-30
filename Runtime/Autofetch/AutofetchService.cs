@@ -4,15 +4,21 @@ using UnityEngine;
 
 namespace LnxArch
 {
-    public static class AutofetchService
+    public sealed class AutofetchService
     {
-        public static void AutofetchAllExistingEntites()
+        public static AutofetchService Instance { get; } = new(AutofetchExecutor.Instance);
+        private readonly AutofetchExecutor _executor;
+        private AutofetchService(AutofetchExecutor executor)
+        {
+            this._executor = executor;
+        }
+        public void AutofetchAllExistingEntites()
         {
             LnxEntity[] allEntities = GameObject.FindObjectsByType<LnxEntity>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             AutofetchEntities(allEntities);
         }
 
-        public static void StartAutofetchChainAt(GameObject gameObject)
+        public void StartAutofetchChainAt(GameObject gameObject)
         {
             LnxEntity rootEntity = gameObject.GetComponentsInParent<LnxEntity>(includeInactive: true)
                 .LastOrDefault(entity => !entity.WasAutofetched);
@@ -20,12 +26,12 @@ namespace LnxArch
             AutofetchChildrenOf(gameObject);
         }
 
-        public static void AutofetchChildrenOf(GameObject gameObject)
+        public void AutofetchChildrenOf(GameObject gameObject)
         {
             AutofetchChildrenOf(new GameObject[] { gameObject });
         }
 
-        public static void AutofetchChildrenOf(IEnumerable<GameObject> gameObjects)
+        public void AutofetchChildrenOf(IEnumerable<GameObject> gameObjects)
         {
             IEnumerable<LnxEntity> entities =
                 gameObjects
@@ -36,7 +42,7 @@ namespace LnxArch
             AutofetchEntities(entities);
         }
 
-        public static void AutofetchEntities(IEnumerable<LnxEntity> entities)
+        public void AutofetchEntities(IEnumerable<LnxEntity> entities)
         {
             HashSet<LnxEntity> pendingEntities =
                 entities
@@ -65,16 +71,11 @@ namespace LnxArch
             }
         }
 
-        private static void AutofetchBehaviours(IEnumerable<MonoBehaviour> allBehaviours)
+        private void AutofetchBehaviours(IEnumerable<MonoBehaviour> allBehaviours)
         {
-            AutofetchExecutor executor = AutofetchExecutor.Instance;
-            TypesPreProcessor typesPreProcessor = TypesPreProcessor.Instance;
-
             foreach (MonoBehaviour behaviour in allBehaviours)
             {
-                AutofetchType type = typesPreProcessor.GetAutofetchType(behaviour.GetType());
-                if (type == null) continue;
-                executor.ExecuteAutofetchOn(behaviour, type);
+                _executor.ExecuteAutofetchOn(behaviour);
             }
         }
     }

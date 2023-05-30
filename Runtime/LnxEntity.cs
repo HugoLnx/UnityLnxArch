@@ -23,7 +23,7 @@ namespace LnxArch
             else
             {
                 if (WasAutofetched) return;
-                AutofetchService.StartAutofetchChainAt(this.gameObject);
+                AutofetchService.Instance.StartAutofetchChainAt(this.gameObject);
                 WasAutofetched = true;
             }
         }

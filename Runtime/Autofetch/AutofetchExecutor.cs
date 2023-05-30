@@ -10,10 +10,23 @@ namespace LnxArch
 {
     public sealed class AutofetchExecutor
     {
-        public static AutofetchExecutor Instance { get; } = new AutofetchExecutor();
-        private AutofetchExecutor() { }
-        public void ExecuteAutofetchOn(MonoBehaviour behaviour, AutofetchType type)
+        public static AutofetchExecutor Instance { get; } = new(TypesPreProcessor.Instance);
+
+        private readonly TypesPreProcessor _typesPreProcessor;
+
+        private AutofetchExecutor(TypesPreProcessor typesPreProcessor) {
+            _typesPreProcessor = typesPreProcessor;
+        }
+        public void ExecuteAutofetchOn(MonoBehaviour behaviour)
         {
+            Assert.IsNotNull(behaviour);
+
+            AutofetchType type = _typesPreProcessor.GetAutofetchTypeOf(behaviour.GetType());
+            if (type == null)
+            {
+                return;
+            }
+
             LnxEntity entity = LnxBehaviour.GetLnxEntity(behaviour);
             Assert.IsNotNull(entity, "Behaviours with Autofetch methods must be inside an LnxEntity");
 

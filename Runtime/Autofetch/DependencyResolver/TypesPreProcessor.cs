@@ -30,7 +30,7 @@ namespace LnxArch
             return MapAutofetchType.ContainsKey(type);
         }
 
-        public AutofetchType GetAutofetchType(Type type)
+        public AutofetchType GetAutofetchTypeOf(Type type)
         {
             return MapAutofetchType.GetValueOrDefault(type);
         }

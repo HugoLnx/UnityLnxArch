@@ -7,7 +7,7 @@ namespace LnxArch
     {
         private void Awake()
         {
-            AutofetchService.AutofetchAllExistingEntites();
+            AutofetchService.Instance.AutofetchAllExistingEntites();
         }
     }
 }
