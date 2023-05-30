@@ -8,18 +8,30 @@ using UnityEngine.Assertions;
 
 namespace LnxArch
 {
+    // TODO: Put traversing logic into interface to make easier to test
+    // different implementations and optimizations
+    // TODO: Optimize to generate minimum garbage
+    // TODO: Optimize to get entity more effectively before visiting node
+    // TODO: Reset autofetched behaviours to avoid memory leaks
     public sealed class AutofetchExecutor
     {
         public static AutofetchExecutor Instance { get; } = new(TypesPreProcessor.Instance);
 
         private readonly TypesPreProcessor _typesPreProcessor;
+        private readonly HashSet<MonoBehaviour> _behavioursAutofetched;
 
         private AutofetchExecutor(TypesPreProcessor typesPreProcessor) {
             _typesPreProcessor = typesPreProcessor;
+            _behavioursAutofetched = new HashSet<MonoBehaviour>();
         }
+
         public void ExecuteAutofetchOn(MonoBehaviour behaviour)
         {
             Assert.IsNotNull(behaviour);
+            if (_behavioursAutofetched.Contains(behaviour))
+            {
+                return;
+            }
 
             AutofetchType type = _typesPreProcessor.GetAutofetchTypeOf(behaviour.GetType());
             if (type == null)
@@ -30,18 +42,49 @@ namespace LnxArch
             LnxEntity entity = LnxBehaviour.GetLnxEntity(behaviour);
             Assert.IsNotNull(entity, "Behaviours with Autofetch methods must be inside an LnxEntity");
 
+            TraverseTreeAutofetchingDependenciesFirst(behaviour, type, entity);
+        }
+
+        private void TraverseTreeAutofetchingDependenciesFirst(Component component, AutofetchType type = null, LnxEntity entity = null)
+        {
+            MonoBehaviour behaviour = component as MonoBehaviour;
+            if (behaviour == null || _behavioursAutofetched.Contains(behaviour))
+            {
+                return;
+            }
+
+            _behavioursAutofetched.Add(behaviour);
+            type ??= _typesPreProcessor.GetAutofetchTypeOf(behaviour.GetType());
+            entity ??= LnxBehaviour.GetLnxEntity(behaviour);
             foreach (AutofetchMethod method in type.AutofetchMethods)
             {
-                method.InvokeWithResolvedParameters(behaviour, param => ResolveParameter(param, method, behaviour, entity));
+                List<Component>[] values = FetchDependenciesOf(method, behaviour, entity);
+                foreach (Component dependency in Flatten(values))
+                {
+                    TraverseTreeAutofetchingDependenciesFirst(dependency);
+                }
+                method.InvokeWithValues(behaviour, values);
             }
         }
 
-        private object ResolveParameter(AutofetchParameter param, AutofetchMethod method, MonoBehaviour behaviour, LnxEntity entity)
+        private static List<Component>[] FetchDependenciesOf(AutofetchMethod method, MonoBehaviour behaviour, LnxEntity entity)
         {
-            object fetched = null;
+            List<Component>[] values = new List<Component>[method.Parameters.Length];
+            for (int i = 0; i < method.Parameters.Length; i++)
+            {
+                AutofetchParameter param = method.Parameters[i];
+                List<Component> fetched = FetchParameter(param, method, behaviour, entity);
+                values[i] = fetched;
+            }
+            return values;
+        }
+
+        private static List<Component> FetchParameter(AutofetchParameter param, AutofetchMethod method, MonoBehaviour behaviour, LnxEntity entity)
+        {
+            List<Component> fetched = null;
             foreach (IFetchAttribute fetchAttribute in param.FetchAttributes)
             {
-                fetched = TryFetchDependencyWith(fetchAttribute, param, behaviour, entity);
+                fetched = FetchDependencyWith(fetchAttribute, param, behaviour, entity);
                 if (fetched != null) break;
             }
 
@@ -59,58 +102,34 @@ namespace LnxArch
             return fetched;
         }
 
-        private object TryFetchDependencyWith(IFetchAttribute fetchAttribute, AutofetchParameter param, MonoBehaviour behaviour, LnxEntity entity)
+        private static List<Component> FetchDependencyWith(IFetchAttribute fetchAttribute, AutofetchParameter param, MonoBehaviour behaviour, LnxEntity entity)
         {
-            object fetched;
-            if (param.HasArrayWrapping)
+            if (param.HasValidCollectionWrap)
             {
-                fetched = ForceCastToArray(
-                    param.ComponentType,
-                    fetchAttribute.FetchMany(behaviour, entity, param.ComponentType)
-                );
-            }
-            else if (param.HasListWrapping)
-            {
-                fetched = ForceCastToList(
-                    param.ComponentType,
-                    fetchAttribute.FetchMany(behaviour, entity, param.ComponentType)
-                );
+                return fetchAttribute
+                    .FetchMany(behaviour, entity, param.ComponentType)
+                    .ToList();
             }
             else
             {
-                fetched = fetchAttribute.FetchOne(behaviour, entity, param.ComponentType);
+                return new List<Component> { fetchAttribute.FetchOne(behaviour, entity, param.ComponentType) };
             }
-            return fetched;
-        }
-        private static object ForceCastToList<T>(Type targetType, IEnumerable<T> enumerable)
-        {
-            MethodInfo castMethod =
-            typeof(AutofetchExecutor)
-            .GetMethod(nameof(AutofetchExecutor.EnumerableCastToList), BindingFlags.NonPublic | BindingFlags.Static)
-            .MakeGenericMethod(typeof(T), targetType);
-            return castMethod.Invoke(null, new object[] { enumerable });
-        }
-        private static object ForceCastToArray<T>(Type targetType, IEnumerable<T> enumerable)
-        {
-            MethodInfo castMethod =
-            typeof(AutofetchExecutor)
-            .GetMethod(nameof(AutofetchExecutor.EnumerableCastToArray), BindingFlags.NonPublic | BindingFlags.Static)
-            .MakeGenericMethod(typeof(T), targetType);
-            return castMethod.Invoke(null, new object[] { enumerable });
-        }
-
-        private static List<K> EnumerableCastToList<T, K>(IEnumerable<T> enumerable)
-        {
-            return enumerable.Cast<K>().ToList();
-        }
-        private static K[] EnumerableCastToArray<T, K>(IEnumerable<T> enumerable)
-        {
-            return enumerable.Cast<K>().ToArray();
         }
 
         private static void AssertNotNull<T, K>(object v)
         {
             Debug.Assert(v != null && !v.Equals(null), $"{typeof(T)}'s dependency {typeof(K)} received no value on construction.");
+        }
+
+        private static IEnumerable<Component> Flatten(IEnumerable<IEnumerable<Component>> componentLists)
+        {
+            foreach (IEnumerable<Component> componentList in componentLists)
+            {
+                foreach (Component component in componentList)
+                {
+                    yield return component;
+                }
+            }
         }
     }
 }

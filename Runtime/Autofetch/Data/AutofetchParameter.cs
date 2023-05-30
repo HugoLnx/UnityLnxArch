@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace LnxArch
 {
@@ -39,6 +40,34 @@ namespace LnxArch
                 parameter: parameter,
                 fetchAttributes: GetFetchAttributesOf(parameter)
             );
+        }
+
+        public object AdaptToBeValueOnInvokeParameter(List<Component> components)
+        {
+            if (components == null) return null;
+
+            if (HasArrayWrapping)
+            {
+                return CollectionParameterCaster.ForceCastToArray(
+                    ComponentType,
+                    components
+                );
+            }
+            else if (HasListWrapping)
+            {
+                return CollectionParameterCaster.ForceCastToList(
+                    ComponentType,
+                    components
+                );
+            }
+            else if (components.Count > 0)
+            {
+                return components[0];
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private static Type GetInnerTypeFrom(Type type, FetchCollectionWrap wrap)

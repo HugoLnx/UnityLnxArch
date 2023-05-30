@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace LnxArch
 {
@@ -39,13 +40,24 @@ namespace LnxArch
                 .Distinct();
         }
 
-        public void InvokeWithResolvedParameters(MonoBehaviour behaviour, Func<AutofetchParameter, object> resolveParameter)
+        public void InvokeWithValues(MonoBehaviour behaviour, List<Component>[] values)
         {
-            foreach (AutofetchParameter param in this.Parameters)
+            int valuesCount = values?.Length ?? 0;
+            Assert.IsNotNull(behaviour);
+            Assert.AreEqual(Parameters.Length, valuesCount);
+
+            if (valuesCount == 0)
             {
-                _valuesBuffer[param.Info.Position] = resolveParameter(param);
+                this.Info.Invoke(behaviour, null);
+                return;
             }
 
+            for (int i = 0; i < valuesCount; i++)
+            {
+                AutofetchParameter param = Parameters[i];
+                List<Component> fetchedComponents = values[i];
+                _valuesBuffer[i] = param.AdaptToBeValueOnInvokeParameter(fetchedComponents);
+            }
             this.Info.Invoke(behaviour, _valuesBuffer);
         }
     }

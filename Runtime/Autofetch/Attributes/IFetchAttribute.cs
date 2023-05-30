@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LnxArch
 {
+    // TODO: Use struct FetchContext to make interface cleaner
     public interface IFetchAttribute
     {
         int Order { get; set; }
