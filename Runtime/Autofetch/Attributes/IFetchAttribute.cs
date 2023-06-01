@@ -4,12 +4,18 @@ using UnityEngine;
 
 namespace LnxArch
 {
-    // TODO: Use struct FetchContext to make interface cleaner
+    public struct FetchContext
+    {
+        public MonoBehaviour Behaviour;
+        public LnxEntity Entity;
+        public Type Type;
+        public AutofetchParameter Parameter;
+    }
     public interface IFetchAttribute
     {
         int LookupOrder { get; set; }
-        Component FetchOne(MonoBehaviour behaviour, LnxEntity entity, Type type);
-        IEnumerable<Component> FetchMany(MonoBehaviour behaviour, LnxEntity entity, Type type);
+        Component FetchOne(FetchContext ctx);
+        IEnumerable<Component> FetchMany(FetchContext ctx);
     }
 
 }

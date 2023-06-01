@@ -14,15 +14,15 @@ namespace LnxArch
             LookupOrder = order;
         }
 
-        public Component FetchOne(MonoBehaviour _, LnxEntity entity, Type type)
+        public Component FetchOne(FetchContext ctx)
         {
-            LnxEntity parentEntity = entity.transform.parent.GetComponentInParent<LnxEntity>(includeInactive: true);
-            return parentEntity.FetchFirst(type);
+            LnxEntity parentEntity = ctx.Entity.transform.parent.GetComponentInParent<LnxEntity>(includeInactive: true);
+            return parentEntity.FetchFirst(ctx.Type);
         }
-        public IEnumerable<Component> FetchMany(MonoBehaviour _, LnxEntity entity, Type type)
+        public IEnumerable<Component> FetchMany(FetchContext ctx)
         {
-            LnxEntity parentEntity = entity.transform.parent.GetComponentInParent<LnxEntity>(includeInactive: true);
-            return parentEntity.FetchAll(type);
+            LnxEntity parentEntity = ctx.Entity.transform.parent.GetComponentInParent<LnxEntity>(includeInactive: true);
+            return parentEntity.FetchAll(ctx.Type);
         }
     }
 

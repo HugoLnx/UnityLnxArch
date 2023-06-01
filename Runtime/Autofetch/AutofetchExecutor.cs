@@ -107,12 +107,12 @@ namespace LnxArch
             if (param.HasValidCollectionWrap)
             {
                 return fetchAttribute
-                    .FetchMany(behaviour, entity, param.ComponentType)
+                    .FetchMany(new FetchContext { Behaviour = behaviour, Entity = entity, Type = param.ComponentType })
                     .ToList();
             }
             else
             {
-                return new List<Component> { fetchAttribute.FetchOne(behaviour, entity, param.ComponentType) };
+                return new List<Component> { fetchAttribute.FetchOne(new FetchContext { Behaviour = behaviour, Entity = entity, Type = param.ComponentType }) };
             }
         }
 
