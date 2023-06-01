@@ -12,24 +12,31 @@ namespace LnxArch
         public MethodInfo Info { get; }
         public AutofetchAttribute AutofetchAttribute { get; }
         public AutofetchParameter[] Parameters { get; }
+        public AutofetchType DeclaringType { get; }
 
         private readonly object[] _valuesBuffer;
 
-        public AutofetchMethod(MethodInfo method, AutofetchAttribute autofetchAttribute, AutofetchParameter[] parameters)
+        public AutofetchMethod(MethodInfo method, AutofetchAttribute autofetchAttribute,
+            AutofetchParameter[] parameters, AutofetchType declaringType)
         {
             Info = method;
             AutofetchAttribute = autofetchAttribute;
             Parameters = parameters;
+            DeclaringType = declaringType;
             _valuesBuffer = new object[parameters.Length];
         }
 
-        public static AutofetchMethod BuildFrom(MethodInfo method)
+        public static AutofetchMethod BuildFrom(MethodInfo method, AutofetchType declaringType)
         {
             // TODO: Verify if method has generics and throw and exception if it does
             return new AutofetchMethod(
                 method: method,
                 autofetchAttribute: method.GetCustomAttribute<AutofetchAttribute>(false),
-                parameters: method.GetParameters().Select(AutofetchParameter.BuildFrom).ToArray()
+                parameters: method
+                    .GetParameters()
+                    .Select(param => AutofetchParameter.BuildFrom(param, declaringType))
+                    .ToArray(),
+                declaringType: declaringType
             );
         }
 

@@ -12,25 +12,39 @@ namespace LnxArch
         public Type Type { get; private set; }
         public AutofetchMethod[] AutofetchMethods { get; private set; }
         public AutofetchAttribute MainAttribute { get; private set; }
+        public Dictionary<string, FieldInfo> InspectorVisibleFields { get; private set; }
         public int Priority { get; set; }
 
-        public AutofetchType(Type type, AutofetchMethod[] autofetchMethods, AutofetchAttribute mainAttribute)
+        public AutofetchType(Type type, AutofetchMethod[] autofetchMethods,
+            AutofetchAttribute mainAttribute, Dictionary<string, FieldInfo> inspectorVisibleFields)
         {
             Type = type;
             AutofetchMethods = autofetchMethods;
             MainAttribute = mainAttribute;
+            InspectorVisibleFields = inspectorVisibleFields;
         }
 
         public static AutofetchType TryToBuildFrom(Type type)
         {
             if (!IsSupported(type)) return null;
-            IEnumerable<AutofetchMethod> autofetchMethods = GetAutoFetchMethodsOf(type);
-            if (!autofetchMethods.Any()) return null;
-            return new AutofetchType(
+            AutofetchType autofetchType =  new(
                 type: type,
-                autofetchMethods: autofetchMethods.ToArray(),
-                mainAttribute: autofetchMethods.First().AutofetchAttribute
+                autofetchMethods: null,
+                mainAttribute: null,
+                inspectorVisibleFields: GetInpectorVisibleFieldsOf(type)
             );
+            IEnumerable<AutofetchMethod> autofetchMethods = BuildAutofetchMethodsOf(type, autofetchType);
+            if (!autofetchMethods.Any()) return null;
+            autofetchType.AutofetchMethods = autofetchMethods.ToArray();
+            autofetchType.MainAttribute = autofetchMethods.First().AutofetchAttribute;
+            return autofetchType;
+        }
+
+        private static Dictionary<string, FieldInfo> GetInpectorVisibleFieldsOf(Type type)
+        {
+            return type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
+                    .Where(f => f.IsPublic || f.GetCustomAttribute<SerializeField>() != null)
+                    .ToDictionary(f => f.Name);
         }
 
         public static bool IsSupported(Type type)
@@ -52,10 +66,10 @@ namespace LnxArch
             return $"AutofetchType-{Type} {Priority}";
         }
 
-        private static IEnumerable<AutofetchMethod> GetAutoFetchMethodsOf(Type type)
+        private static IEnumerable<AutofetchMethod> BuildAutofetchMethodsOf(Type type, AutofetchType declaringType)
         {
             return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
-            .Select(AutofetchMethod.BuildFrom)
+            .Select(method => AutofetchMethod.BuildFrom(method, declaringType))
             .Where(m => m.AutofetchAttribute != null);
         }
     }
