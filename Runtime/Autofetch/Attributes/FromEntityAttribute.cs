@@ -7,11 +7,11 @@ namespace LnxArch
     [AttributeUsage(AttributeTargets.Parameter)]
     public sealed class FromEntityAttribute : Attribute, IFetchAttribute
     {
-        public int Order { get; set; }
+        public int LookupOrder { get; set; }
 
         public FromEntityAttribute(int order = 0)
         {
-            this.Order = order;
+            this.LookupOrder = order;
         }
 
         public Component FetchOne(MonoBehaviour _, LnxEntity entity, Type type)

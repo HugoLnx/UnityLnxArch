@@ -98,7 +98,7 @@ namespace LnxArch
             IEnumerable<IFetchAttribute> explicitDeclaredAttributes = Attribute.GetCustomAttributes(parameter)
                 .Where(attr => typeof(IFetchAttribute).IsAssignableFrom(attr.GetType()))
                 .Select(attr => (IFetchAttribute) attr)
-                .OrderBy(attr => attr.Order);
+                .OrderBy(attr => attr.LookupOrder);
 
             if (explicitDeclaredAttributes.Any())
             {

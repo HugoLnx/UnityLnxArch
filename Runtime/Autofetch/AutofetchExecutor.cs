@@ -85,7 +85,7 @@ namespace LnxArch
             foreach (IFetchAttribute fetchAttribute in param.FetchAttributes)
             {
                 fetched = FetchDependencyWith(fetchAttribute, param, behaviour, entity);
-                if (fetched != null) break;
+                if (fetched.Count > 0 && fetched[0] != null) break;
             }
 
             // Debug.Log($"[Fetched:{behaviour.GetType().Name}] {param.Type.Name} {param.Info.Name} = {fetched?.GetType()}");
