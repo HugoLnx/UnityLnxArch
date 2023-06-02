@@ -8,44 +8,44 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using System.Linq;
 
-namespace LnxArch.Tests
+namespace LnxArch.LnxInitTests
 {
-    public class LnxInit_CircularSelfTests
+    public class DefaultParameterTests
     {
         #region Nested
         public struct EntityContext
         {
-            public CaseCircularSelf Main { get; private set; }
-            public CallsRegister Register { get; private set; }
+            public CaseDefaultParameter Main { get; private set; }
+            public Collider Collider { get; private set; }
 
             public static EntityContext Create(LnxEntity entity)
             {
                 return new EntityContext {
-                    Main = entity.FetchFirst<CaseCircularSelf>(),
-                    Register = entity.FetchFirst<CallsRegister>(),
+                    Main = entity.FetchFirst<CaseDefaultParameter>(),
+                    Collider = entity.FetchFirst<Collider>()
                 };
             }
         }
         #endregion
         private readonly FixturesLoader _fixtures = FixturesLoader.RuntimeLnxInit;
         [Test]
-        public void InjectsItSelf()
+        public void WhenComponentIsFound_InjectsIt()
         {
-            var entity = _fixtures.InstantiateEntityPrefab("CircularSelf");
+            var entity = _fixtures.InstantiateEntityPrefab("DefaultParameter_Found");
             EntityContext ctx = EntityContext.Create(entity);
             Assert.That(ctx.Main, Is.Not.Null);
+            Assert.That(ctx.Collider, Is.Not.Null);
 
-            Assert.That(ctx.Main.Circular, Is.EqualTo(ctx.Main));
+            Assert.That(ctx.Main.Collider, Is.EqualTo(ctx.Collider));
         }
-
         [Test]
-        public void OnlyInitializesOnce()
+        public void WhenComponentIsNotFound_UsesDefaultValue()
         {
-            var entity = _fixtures.InstantiateEntityPrefab("CircularSelf");
+            var entity = _fixtures.InstantiateEntityPrefab("DefaultParameter_NotFound");
             EntityContext ctx = EntityContext.Create(entity);
             Assert.That(ctx.Main, Is.Not.Null);
 
-            Assert.That(ctx.Register.Calls.Count, Is.EqualTo(1));
+            Assert.That(ctx.Main.Collider, Is.Null);
         }
     }
 }

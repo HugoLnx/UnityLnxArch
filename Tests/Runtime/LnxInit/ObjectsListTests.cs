@@ -1,21 +1,17 @@
-using System.Collections;
 using System.Collections.Generic;
-using LnxArch;
 using NUnit.Framework;
 using LnxArch.TestTools;
 using LnxArch.TestFixtures;
 using UnityEngine;
-using UnityEngine.TestTools;
-using System.Linq;
 
-namespace LnxArch.Tests
+namespace LnxArch.LnxInitTests
 {
-    public class LnxInit_LookupFromLocalTests
+    public class ObjectsListTests
     {
         #region Nested
         public struct EntityContext
         {
-            public CaseLookupFromLocal Main { get; private set; }
+            public CaseObjectsList Main { get; private set; }
             public BoxCollider BoxCollider { get; private set; }
             public SphereCollider SphereCollider { get; private set; }
             public CapsuleCollider CapsuleCollider { get; private set; }
@@ -23,7 +19,7 @@ namespace LnxArch.Tests
             public static EntityContext Create(LnxEntity entity)
             {
                 return new EntityContext {
-                    Main = entity.FetchFirst<CaseLookupFromLocal>(),
+                    Main = entity.FetchFirst<CaseObjectsList>(),
                     BoxCollider = entity.FetchFirst<BoxCollider>(),
                     SphereCollider = entity.FetchFirst<SphereCollider>(),
                     CapsuleCollider = entity.FetchFirst<CapsuleCollider>()
@@ -33,27 +29,30 @@ namespace LnxArch.Tests
         #endregion
         private readonly FixturesLoader _fixtures = FixturesLoader.RuntimeLnxInit;
         [Test]
-        public void WhenFetchingOne_GetTheFirstComponentFoundInTheLocalObject()
+        public void WhenHasMatch_ReturnsAllMatchingComponents()
         {
-            var entity = _fixtures.InstantiateEntityPrefab("LookupFromLocal");
+            var entity = _fixtures.InstantiateEntityPrefab("ObjectsList");
             EntityContext ctx = EntityContext.Create(entity);
             Assert.That(ctx.Main, Is.Not.Null);
             Assert.That(ctx.BoxCollider, Is.Not.Null);
+            Assert.That(ctx.SphereCollider, Is.Not.Null);
+            Assert.That(ctx.CapsuleCollider, Is.Not.Null);
 
-            Assert.That(ctx.Main.Collider, Is.EqualTo(ctx.BoxCollider));
+            Assert.That(ctx.Main.Colliders, Is.EqualTo(new List<Collider>() {
+                ctx.BoxCollider,
+                ctx.SphereCollider,
+                ctx.CapsuleCollider
+            }));
         }
 
         [Test]
-        public void WhenFetchingMany_GetAllTheComponentsFoundInTheEntity()
+        public void WhenHasNoMatch_ReturnsEmptyArray()
         {
-            var entity = _fixtures.InstantiateEntityPrefab("LookupFromLocal");
+            var entity = _fixtures.InstantiateEntityPrefab("ObjectsList");
             EntityContext ctx = EntityContext.Create(entity);
             Assert.That(ctx.Main, Is.Not.Null);
-            Assert.That(ctx.BoxCollider, Is.Not.Null);
 
-            Assert.That(ctx.Main.Colliders, Is.EqualTo(new List<Collider> {
-                ctx.BoxCollider,
-            }));
+            Assert.That(ctx.Main.Rigidbodies, Is.Empty);
         }
     }
 }

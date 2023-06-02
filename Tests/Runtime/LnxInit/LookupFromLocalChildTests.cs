@@ -8,23 +8,23 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using System.Linq;
 
-namespace LnxArch.Tests
+namespace LnxArch.LnxInitTests
 {
-    public class LnxInit_LookupFromLocalAncestorTests
+    public class LookupFromLocalChildTests
     {
         #region Nested
         public struct EntityContext
         {
-            public CaseLookupFromLocalAncestor Main { get; private set; }
-            public BoxCollider ParentBoxCollider { get; private set; }
+            public CaseLookupFromLocalChild Main { get; private set; }
+            public BoxCollider ChildBoxCollider { get; private set; }
             public BoxCollider LocalBoxCollider { get; private set; }
 
             public static EntityContext Create(LnxEntity entity)
             {
-                var main = entity.FetchFirst<CaseLookupFromLocalAncestor>();
+                var main = entity.FetchFirst<CaseLookupFromLocalChild>();
                 return new EntityContext {
                     Main = main,
-                    ParentBoxCollider = main.transform.parent.GetComponentInParent<BoxCollider>(),
+                    ChildBoxCollider = main.transform.GetChild(0).GetComponentInChildren<BoxCollider>(),
                     LocalBoxCollider = main.GetComponent<BoxCollider>()
                 };
             }
@@ -32,32 +32,32 @@ namespace LnxArch.Tests
         #endregion
         private readonly FixturesLoader _fixtures = FixturesLoader.RuntimeLnxInit;
         [Test]
-        public void WhenFetchingOne_GetTheFirstComponentFoundInTheLocalAncestor()
+        public void WhenFetchingOne_GetTheFirstComponentFoundInLocalChildren()
         {
-            var entity = _fixtures.InstantiateEntityPrefab("LookupFromLocalAncestor_Default");
+            var entity = _fixtures.InstantiateEntityPrefab("LookupFromLocalChild_Default");
             EntityContext ctx = EntityContext.Create(entity);
             Assert.That(ctx.Main, Is.Not.Null);
-            Assert.That(ctx.ParentBoxCollider, Is.Not.Null);
+            Assert.That(ctx.ChildBoxCollider, Is.Not.Null);
 
-            Assert.That(ctx.Main.Collider, Is.EqualTo(ctx.ParentBoxCollider));
+            Assert.That(ctx.Main.Collider, Is.EqualTo(ctx.ChildBoxCollider));
         }
 
         [Test]
-        public void WhenFetchingMany_GetAllTheComponentsFoundInTheLocalAncestors()
+        public void WhenFetchingMany_GetAllTheComponentsFoundInLocalChildren()
         {
-            var entity = _fixtures.InstantiateEntityPrefab("LookupFromLocalAncestor_Default");
+            var entity = _fixtures.InstantiateEntityPrefab("LookupFromLocalChild_Default");
             EntityContext ctx = EntityContext.Create(entity);
             Assert.That(ctx.Main, Is.Not.Null);
-            Assert.That(ctx.ParentBoxCollider, Is.Not.Null);
+            Assert.That(ctx.ChildBoxCollider, Is.Not.Null);
 
             Assert.That(ctx.Main.Colliders, Is.EqualTo(new List<Collider> {
-                ctx.ParentBoxCollider,
+                ctx.ChildBoxCollider,
             }));
         }
         [Test]
         public void When_LocalHasMatch_FetchingOne_GetTheLocalComponent()
         {
-            var entity = _fixtures.InstantiateEntityPrefab("LookupFromLocalAncestor_WithLocalCollider");
+            var entity = _fixtures.InstantiateEntityPrefab("LookupFromLocalChild_WithLocalCollider");
             EntityContext ctx = EntityContext.Create(entity);
             Assert.That(ctx.Main, Is.Not.Null);
             Assert.That(ctx.LocalBoxCollider, Is.Not.Null);
@@ -68,15 +68,15 @@ namespace LnxArch.Tests
         [Test]
         public void When_LocalHasMatch_FetchingOne_IncludesTheLocalComponent()
         {
-            var entity = _fixtures.InstantiateEntityPrefab("LookupFromLocalAncestor_WithLocalCollider");
+            var entity = _fixtures.InstantiateEntityPrefab("LookupFromLocalChild_WithLocalCollider");
             EntityContext ctx = EntityContext.Create(entity);
             Assert.That(ctx.Main, Is.Not.Null);
             Assert.That(ctx.LocalBoxCollider, Is.Not.Null);
-            Assert.That(ctx.ParentBoxCollider, Is.Not.Null);
+            Assert.That(ctx.ChildBoxCollider, Is.Not.Null);
 
             Assert.That(ctx.Main.Colliders, Is.EqualTo(new List<Collider> {
                 ctx.LocalBoxCollider,
-                ctx.ParentBoxCollider,
+                ctx.ChildBoxCollider,
             }));
         }
     }

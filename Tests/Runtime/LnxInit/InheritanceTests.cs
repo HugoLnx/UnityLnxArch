@@ -8,9 +8,9 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using System.Linq;
 
-namespace LnxArch.Tests
+namespace LnxArch.LnxInitTests
 {
-    public class LnxInit_InheritanceTests
+    public class InheritanceTests
     {
         #region Nested
         public struct EntityContext

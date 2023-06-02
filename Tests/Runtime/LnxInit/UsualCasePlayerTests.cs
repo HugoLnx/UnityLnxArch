@@ -7,9 +7,9 @@ using LnxArch.TestFixtures;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace LnxArch.Tests
+namespace LnxArch.LnxInitTests
 {
-    public class LnxInit_UsualCasePlayerTests
+    public class UsualCasePlayerTests
     {
         #region Nested
         public struct EntityContext

@@ -2,9 +2,9 @@ using NUnit.Framework;
 using LnxArch.TestTools;
 using LnxArch.TestFixtures;
 
-namespace LnxArch.Tests
+namespace LnxArch.LnxInitTests
 {
-    public class LnxInit_CircularSmallTests
+    public class CircularSmallTests
     {
         #region Nested
         public struct EntityContext

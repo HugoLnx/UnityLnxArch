@@ -3,9 +3,9 @@ using LnxArch.TestTools;
 using LnxArch.TestFixtures;
 using UnityEngine;
 
-namespace LnxArch.Tests
+namespace LnxArch.LnxInitTests
 {
-    public class LnxInit_InterfaceParameterTests
+    public class InterfaceParameterTests
     {
         #region Nested
         public struct EntityContext
