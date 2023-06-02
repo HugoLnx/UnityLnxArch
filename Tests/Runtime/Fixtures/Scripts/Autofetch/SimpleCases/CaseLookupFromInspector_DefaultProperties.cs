@@ -10,7 +10,7 @@ namespace LnxArch.TestFixtures
         [field: SerializeField] public Collider Collider { get; private set; }
         [field: SerializeField] public List<Collider> Colliders { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void PrepareOne(
             [FromInspector]
             Collider collider
@@ -21,7 +21,7 @@ namespace LnxArch.TestFixtures
             CallsRegister.FindAndRecordFor(this, nameof(PrepareOne));
         }
 
-        [Autofetch]
+        [LnxInit]
         public void PrepareMany(
             [FromInspector]
             List<Collider> colliders

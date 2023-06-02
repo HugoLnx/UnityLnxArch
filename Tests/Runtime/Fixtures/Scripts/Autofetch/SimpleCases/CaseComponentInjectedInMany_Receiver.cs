@@ -8,7 +8,7 @@ namespace LnxArch.TestFixtures
         [SerializeField] private bool _log;
         public CaseComponentInjectedInMany_Target Target { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(CaseComponentInjectedInMany_Target target)
         {
             Target = target;

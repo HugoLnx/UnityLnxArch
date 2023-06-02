@@ -8,7 +8,7 @@ namespace LnxArch.TestFixtures
         [SerializeField] private bool _log;
         public IInterfaceParameterCase Implementer { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(IInterfaceParameterCase implementer)
         {
             Implementer = implementer;

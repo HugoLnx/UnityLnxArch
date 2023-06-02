@@ -10,7 +10,7 @@ namespace LnxArch.TestFixtures
         public Collider Collider { get; private set; }
         public List<Collider> Colliders { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void PrepareOne(
             [FromLocal(LookupOrder = 0)]
             [FromLocalAncestor(LookupOrder = 1)]
@@ -24,7 +24,7 @@ namespace LnxArch.TestFixtures
             CallsRegister.FindAndRecordFor(this, nameof(PrepareOne));
         }
 
-        [Autofetch]
+        [LnxInit]
         public void PrepareMany(
             [FromLocal(LookupOrder = 0)]
             [FromLocalAncestor(LookupOrder = 1)]

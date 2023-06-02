@@ -9,7 +9,7 @@ namespace LnxArch.TestFixtures
         [SerializeField] private bool _log;
         public Transform Transform;
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(Transform trans)
         {
             Transform = trans;

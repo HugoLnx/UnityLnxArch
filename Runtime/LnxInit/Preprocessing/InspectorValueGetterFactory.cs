@@ -5,7 +5,7 @@ namespace LnxArch
 {
     public static class InspectorValueGetterFactory
     {
-        public static IInspectorValueGetter TryBuildFor(AutofetchType declaringType, string lookupBaseName)
+        public static IInspectorValueGetter TryBuildFor(InitType declaringType, string lookupBaseName)
         {
             foreach (string lookupName in BuildLookupNames(lookupBaseName))
             {

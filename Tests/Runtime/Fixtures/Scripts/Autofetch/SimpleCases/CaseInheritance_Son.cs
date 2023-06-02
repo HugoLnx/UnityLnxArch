@@ -10,7 +10,7 @@ namespace LnxArch.TestFixtures
         public List<CaseInheritance_Father> Fathers { get; private set; }
         public CapsuleCollider CapsuleCollider { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void PrepareSon(CapsuleCollider collider, List<CaseInheritance_Grandfather> grandfathers, List<CaseInheritance_Father> fathers)
         {
             Grandfathers = grandfathers;

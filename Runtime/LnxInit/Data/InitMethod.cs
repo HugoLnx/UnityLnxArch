@@ -7,34 +7,34 @@ using UnityEngine.Assertions;
 
 namespace LnxArch
 {
-    public readonly struct AutofetchMethod
+    public readonly struct InitMethod
     {
         public MethodInfo Info { get; }
-        public AutofetchAttribute AutofetchAttribute { get; }
-        public AutofetchParameter[] Parameters { get; }
-        public AutofetchType DeclaringType { get; }
+        public LnxInitAttribute InitAttribute { get; }
+        public InitMethodParameter[] Parameters { get; }
+        public InitType DeclaringType { get; }
 
         private readonly object[] _valuesBuffer;
 
-        public AutofetchMethod(MethodInfo method, AutofetchAttribute autofetchAttribute,
-            AutofetchParameter[] parameters, AutofetchType declaringType)
+        public InitMethod(MethodInfo method, LnxInitAttribute initAttribute,
+            InitMethodParameter[] parameters, InitType declaringType)
         {
             Info = method;
-            AutofetchAttribute = autofetchAttribute;
+            InitAttribute = initAttribute;
             Parameters = parameters;
             DeclaringType = declaringType;
             _valuesBuffer = new object[parameters.Length];
         }
 
-        public static AutofetchMethod BuildFrom(MethodInfo method, AutofetchType declaringType)
+        public static InitMethod BuildFrom(MethodInfo method, InitType declaringType)
         {
             // TODO: Verify if method has generics and throw and exception if it does
-            return new AutofetchMethod(
+            return new InitMethod(
                 method: method,
-                autofetchAttribute: method.GetCustomAttribute<AutofetchAttribute>(false),
+                initAttribute: method.GetCustomAttribute<LnxInitAttribute>(false),
                 parameters: method
                     .GetParameters()
-                    .Select(param => AutofetchParameter.BuildFrom(param, declaringType))
+                    .Select(param => InitMethodParameter.BuildFrom(param, declaringType))
                     .ToArray(),
                 declaringType: declaringType
             );
@@ -61,7 +61,7 @@ namespace LnxArch
 
             for (int i = 0; i < valuesCount; i++)
             {
-                AutofetchParameter param = Parameters[i];
+                InitMethodParameter param = Parameters[i];
                 List<Component> fetchedComponents = values[i];
                 _valuesBuffer[i] = param.AdaptToBeValueOnInvokeParameter(fetchedComponents);
             }

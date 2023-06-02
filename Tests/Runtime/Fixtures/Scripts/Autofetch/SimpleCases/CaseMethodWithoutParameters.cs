@@ -8,7 +8,7 @@ namespace LnxArch.TestFixtures
     {
         [SerializeField] private bool _log;
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare()
         {
             if (_log) Debug.Log($"[Prepared:{this.GetType().Name}-{this.name}]");

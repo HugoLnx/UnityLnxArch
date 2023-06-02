@@ -12,74 +12,74 @@ namespace LnxArch
     // different implementations and optimizations
     // TODO: Optimize to generate minimum garbage
     // TODO: Optimize to get entity more effectively before visiting node
-    // TODO: Reset autofetched behaviours to avoid memory leaks
-    public sealed class AutofetchExecutor
+    // TODO: Reset initialized behaviours to avoid memory leaks
+    public sealed class InitExecutor
     {
-        public static AutofetchExecutor Instance { get; } = new(TypesPreProcessor.Instance);
+        public static InitExecutor Instance { get; } = new(TypesPreProcessor.Instance);
 
         private readonly TypesPreProcessor _typesPreProcessor;
-        private readonly HashSet<MonoBehaviour> _behavioursAutofetched;
+        private readonly HashSet<MonoBehaviour> _initialized;
 
-        private AutofetchExecutor(TypesPreProcessor typesPreProcessor) {
+        private InitExecutor(TypesPreProcessor typesPreProcessor) {
             _typesPreProcessor = typesPreProcessor;
-            _behavioursAutofetched = new HashSet<MonoBehaviour>();
+            _initialized = new HashSet<MonoBehaviour>();
         }
 
-        public void ExecuteAutofetchOn(MonoBehaviour behaviour)
+        public void ExecuteInitMethodsOn(MonoBehaviour behaviour, bool force = false)
         {
             Assert.IsNotNull(behaviour);
-            if (_behavioursAutofetched.Contains(behaviour))
+            if (_initialized.Contains(behaviour) && !force)
             {
                 return;
             }
 
-            AutofetchType type = _typesPreProcessor.GetAutofetchTypeOf(behaviour.GetType());
+            InitType type = _typesPreProcessor.GetInitTypeOf(behaviour.GetType());
             if (type == null)
             {
                 return;
             }
 
             LnxEntity entity = LnxBehaviour.GetLnxEntity(behaviour);
-            Assert.IsNotNull(entity, "Behaviours with Autofetch methods must be inside an LnxEntity");
+            Assert.IsNotNull(entity, "Behaviours with LnxInit methods must be inside an LnxEntity");
 
-            TraverseTreeAutofetchingDependenciesFirst(behaviour, type, entity);
+            TraverseTreeInitializingDependenciesFirst(behaviour, type, entity);
         }
 
-        private void TraverseTreeAutofetchingDependenciesFirst(Component component, AutofetchType type = null, LnxEntity entity = null)
+        private void TraverseTreeInitializingDependenciesFirst(Component component, InitType type = null, LnxEntity entity = null)
         {
             MonoBehaviour behaviour = component as MonoBehaviour;
-            if (behaviour == null || _behavioursAutofetched.Contains(behaviour))
+            if (behaviour == null || _initialized.Contains(behaviour))
             {
                 return;
             }
 
-            _behavioursAutofetched.Add(behaviour);
-            type ??= _typesPreProcessor.GetAutofetchTypeOf(behaviour.GetType());
+            _initialized.Add(behaviour);
+            type ??= _typesPreProcessor.GetInitTypeOf(behaviour.GetType());
             entity ??= LnxBehaviour.GetLnxEntity(behaviour);
-            foreach (AutofetchMethod method in type.AutofetchMethods)
+            foreach (InitMethod method in type.InitMethods)
             {
                 List<Component>[] values = FetchDependenciesOf(method, behaviour, entity);
                 foreach (Component dependency in Flatten(values))
                 {
-                    TraverseTreeAutofetchingDependenciesFirst(dependency);
+                    TraverseTreeInitializingDependenciesFirst(dependency);
                 }
                 method.InvokeWithValues(behaviour, values);
             }
         }
 
-        private static List<Component>[] FetchDependenciesOf(AutofetchMethod method, MonoBehaviour behaviour, LnxEntity entity)
+        private static List<Component>[] FetchDependenciesOf(InitMethod method, MonoBehaviour behaviour, LnxEntity entity)
         {
             List<Component>[] values = new List<Component>[method.Parameters.Length];
             for (int i = 0; i < method.Parameters.Length; i++)
             {
-                AutofetchParameter param = method.Parameters[i];
+                InitMethodParameter param = method.Parameters[i];
                 List<Component> fetched = FetchParameter(param, method, behaviour, entity);
                 values[i] = fetched;
             }
             return values;
         }
 
-        private static List<Component> FetchParameter(AutofetchParameter param, AutofetchMethod method, MonoBehaviour behaviour, LnxEntity entity)
+        private static List<Component> FetchParameter(InitMethodParameter param, InitMethod method, MonoBehaviour behaviour, LnxEntity entity)
         {
             List<Component> fetched = null;
             foreach (IFetchAttribute fetchAttribute in param.FetchAttributes)
@@ -91,7 +91,7 @@ namespace LnxArch
             // Debug.Log($"[Fetched:{behaviour.GetType().Name}] {param.Type.Name} {param.Info.Name} = {fetched?.GetType()}");
             if (!param.Info.HasDefaultValue)
             {
-                string errorPrefix = $"[LnxArch:AutoFetch:{behaviour.GetType().Name}#{method.Info.Name}({param.Type.Name} {param.Info.Name})]";
+                string errorPrefix = $"[LnxArch:LnxInit:{behaviour.GetType().Name}#{method.Info.Name}({param.Type.Name} {param.Info.Name})]";
                 Assert.IsTrue(
                     !typeof(IEnumerable<>).IsAssignableFrom(param.Type)
                     || param.HasValidCollectionWrap,
@@ -102,7 +102,7 @@ namespace LnxArch
             return fetched;
         }
 
-        private static List<Component> FetchDependencyWith(IFetchAttribute fetchAttribute, AutofetchParameter param, MonoBehaviour behaviour, LnxEntity entity)
+        private static List<Component> FetchDependencyWith(IFetchAttribute fetchAttribute, InitMethodParameter param, MonoBehaviour behaviour, LnxEntity entity)
         {
             if (param.HasValidCollectionWrap)
             {

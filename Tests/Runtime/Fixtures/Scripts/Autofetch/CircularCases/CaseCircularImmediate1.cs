@@ -9,7 +9,7 @@ namespace LnxArch.TestFixtures
         [SerializeField] private bool _log;
         public CaseCircularImmediate0 Circular { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         private void Prepare(CaseCircularImmediate0 circular)
         {
             Circular = circular;

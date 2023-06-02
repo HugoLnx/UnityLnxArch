@@ -29,7 +29,7 @@ namespace LnxArch
         private static LnxEntity LnxEntityLookup(Component component)
         {
             LnxEntity entity = LnxEntity.FetchEntityOf(component);
-            Assert.IsNotNull(entity, $"{component.GetType().Name} must be inside a LnxEntity to be a LnxBehaviour or have an Autofetch method.");
+            Assert.IsNotNull(entity, $"{component.GetType().Name} must be inside a LnxEntity to be a LnxBehaviour or have an LnxInit method.");
             return entity;
         }
 

@@ -13,7 +13,7 @@ namespace LnxArch.TestFixtures
         public Position Position;
         public Body Body;
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(Movement movement, Direction direction, Position position, Body body)
         {
             Movement = movement;

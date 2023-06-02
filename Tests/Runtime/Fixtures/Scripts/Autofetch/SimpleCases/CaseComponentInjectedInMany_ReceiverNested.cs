@@ -9,7 +9,7 @@ namespace LnxArch.TestFixtures
         public CaseComponentInjectedInMany_Target Target { get; private set; }
         public CaseComponentInjectedInMany_Receiver Receiver { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(CaseComponentInjectedInMany_Target target, CaseComponentInjectedInMany_Receiver receiver)
         {
             Target = target;

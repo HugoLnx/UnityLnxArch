@@ -9,7 +9,7 @@ namespace LnxArch
         public MonoBehaviour Behaviour;
         public LnxEntity Entity;
         public Type Type;
-        public AutofetchParameter Parameter;
+        public InitMethodParameter Parameter;
     }
     public interface IFetchAttribute
     {

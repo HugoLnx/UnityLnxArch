@@ -21,7 +21,7 @@ namespace LnxArch
 #endregion
 
 #region Constructors
-        [Autofetch]
+        [LnxInit]
         protected void PrepareDeriver(
             [FromLocal(order: 0)]
             [FromEntity(order: 1)]

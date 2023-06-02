@@ -9,7 +9,7 @@ namespace LnxArch.TestFixtures
         public Collider BoxCollider { get; private set; }
         public abstract SphereCollider SphereCollider { get; protected set; }
 
-        [Autofetch]
+        [LnxInit]
         public void PrepareFromAbstract(BoxCollider boxCollider)
         {
             BoxCollider = boxCollider;

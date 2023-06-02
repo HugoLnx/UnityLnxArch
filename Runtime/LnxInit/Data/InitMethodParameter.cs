@@ -7,11 +7,11 @@ using UnityEngine;
 namespace LnxArch
 {
     public enum FetchCollectionWrap { None, Array, List }
-    public readonly struct AutofetchParameter
+    public readonly struct InitMethodParameter
     {
         public Type Type { get; }
         public Type ComponentType { get; }
-        public AutofetchType DeclaringType { get; }
+        public InitType DeclaringType { get; }
         private FetchCollectionWrap CollectionWrap { get; }
         public ParameterInfo Info { get; }
         public IFetchAttribute[] FetchAttributes { get; }
@@ -20,9 +20,9 @@ namespace LnxArch
         public bool HasArrayWrapping => CollectionWrap == FetchCollectionWrap.Array;
         public bool HasValidCollectionWrap => CollectionWrap != FetchCollectionWrap.None;
 
-        public AutofetchParameter(Type type, Type componentType,
+        public InitMethodParameter(Type type, Type componentType,
             FetchCollectionWrap collectionWrap, ParameterInfo parameter,
-            IFetchAttribute[] fetchAttributes, AutofetchType declaringType)
+            IFetchAttribute[] fetchAttributes, InitType declaringType)
         {
             Type = type;
             ComponentType = componentType;
@@ -33,10 +33,10 @@ namespace LnxArch
             FillInspectorGetters();
         }
 
-        public static AutofetchParameter BuildFrom(ParameterInfo parameter, AutofetchType declaringType)
+        public static InitMethodParameter BuildFrom(ParameterInfo parameter, InitType declaringType)
         {
             FetchCollectionWrap collectionWrap = GetCollectionType(parameter.ParameterType);
-            return new AutofetchParameter(
+            return new InitMethodParameter(
                 type: parameter.ParameterType,
                 componentType: GetInnerTypeFrom(parameter.ParameterType, collectionWrap),
                 collectionWrap: collectionWrap,

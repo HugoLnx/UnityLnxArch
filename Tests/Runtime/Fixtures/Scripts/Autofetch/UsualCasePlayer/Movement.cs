@@ -10,7 +10,7 @@ namespace LnxArch.TestFixtures
         public Direction Direction;
         public Position Position;
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(Direction direction, Position position)
         {
             Direction = direction;

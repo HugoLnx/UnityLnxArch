@@ -9,7 +9,7 @@ namespace LnxArch.TestFixtures
         [SerializeField] private bool _log;
         public Rigidbody Rigidbody;
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(Rigidbody rigidbody)
         {
             Rigidbody = rigidbody;

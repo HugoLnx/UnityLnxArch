@@ -11,7 +11,7 @@ namespace LnxArch.TestFixtures
         public List<Collider> Colliders { get; private set; }
         public List<Rigidbody> Rigidbodies { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(List<Collider> colliders, List<Rigidbody> rigidbodies)
         {
             Colliders = colliders;

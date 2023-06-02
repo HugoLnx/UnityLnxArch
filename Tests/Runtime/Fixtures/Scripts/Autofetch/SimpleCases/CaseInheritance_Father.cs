@@ -7,7 +7,7 @@ namespace LnxArch.TestFixtures
     {
         public SphereCollider SphereCollider { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void PrepareFather(SphereCollider sphereCollider)
         {
             SphereCollider = sphereCollider;

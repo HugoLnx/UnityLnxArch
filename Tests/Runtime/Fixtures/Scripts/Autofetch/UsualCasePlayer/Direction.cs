@@ -9,7 +9,7 @@ namespace LnxArch.TestFixtures
         [SerializeField] private bool _log;
         public Rotation Rotation;
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(Rotation rotation)
         {
             Rotation = rotation;

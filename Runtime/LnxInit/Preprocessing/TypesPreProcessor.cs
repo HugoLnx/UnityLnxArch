@@ -8,12 +8,12 @@ namespace LnxArch
     {
         public static TypesPreProcessor Instance { get; } = new TypesPreProcessor();
         private IEnumerable<Type> _allTypes;
-        private Dictionary<Type, AutofetchType> _mapAutofetchType;
+        private Dictionary<Type, InitType> _mapInitType;
 
-        private Dictionary<Type, AutofetchType> MapAutofetchType =>
-            _mapAutofetchType ??=
+        private Dictionary<Type, InitType> MapInitType =>
+            _mapInitType ??=
             AllTypes
-            .Select(t => AutofetchType.TryToBuildFrom(t))
+            .Select(t => InitType.TryToBuildFrom(t))
             .Where(t => t != null)
             .ToDictionary(t => t.Type, t => t);
 
@@ -25,14 +25,14 @@ namespace LnxArch
 
         private TypesPreProcessor() { }
 
-        public bool IsAutofetchType(Type type)
+        public bool IsInitType(Type type)
         {
-            return MapAutofetchType.ContainsKey(type);
+            return MapInitType.ContainsKey(type);
         }
 
-        public AutofetchType GetAutofetchTypeOf(Type type)
+        public InitType GetInitTypeOf(Type type)
         {
-            return MapAutofetchType.GetValueOrDefault(type);
+            return MapInitType.GetValueOrDefault(type);
         }
     }
 }

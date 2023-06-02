@@ -10,7 +10,7 @@ namespace LnxArch.TestFixtures
         public BoxCollider BoxCollider { get; private set; }
         public SphereCollider SphereCollider { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare1(BoxCollider boxCollider)
         {
             BoxCollider = boxCollider;
@@ -18,7 +18,7 @@ namespace LnxArch.TestFixtures
             CallsRegister.FindAndRecordFor(this, nameof(Prepare1));
         }
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare2(SphereCollider sphereCollider)
         {
             SphereCollider = sphereCollider;

@@ -10,22 +10,14 @@ namespace LnxArch
     [DefaultExecutionOrder (-9997)]
     public class LnxEntity : MonoBehaviour
     {
-        private static LnxSceneAutofetcher s_sceneAutofetcher;
-        public bool WasAutofetched { get; set; }
+        public bool WasInitialized { get; set; }
         private const bool DefaultIncludeInactive = true;
 
         private void Awake()
         {
-            if (s_sceneAutofetcher == null)
-            {
-                s_sceneAutofetcher = new GameObject("LnxSceneAutofetcher").AddComponent<LnxSceneAutofetcher>();
-            }
-            else
-            {
-                if (WasAutofetched) return;
-                AutofetchService.Instance.StartAutofetchChainAt(this.gameObject);
-                WasAutofetched = true;
-            }
+            if (WasInitialized) return;
+            InitService.Instance.InitEntity(this);
+            WasInitialized = true;
         }
 
         public T FetchFirst<T>(bool includeInactive = DefaultIncludeInactive, bool canBeNull = true)

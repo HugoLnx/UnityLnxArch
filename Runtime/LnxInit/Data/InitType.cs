@@ -6,38 +6,34 @@ using UnityEngine;
 
 namespace LnxArch
 {
-    public class AutofetchType
+    public class InitType
     {
         public static Type BaseType = typeof(MonoBehaviour);
         public Type Type { get; private set; }
-        public AutofetchMethod[] AutofetchMethods { get; private set; }
-        public AutofetchAttribute MainAttribute { get; private set; }
+        public InitMethod[] InitMethods { get; private set; }
         public Dictionary<string, FieldInfo> InspectorVisibleFields { get; private set; }
         public int Priority { get; set; }
 
-        public AutofetchType(Type type, AutofetchMethod[] autofetchMethods,
-            AutofetchAttribute mainAttribute, Dictionary<string, FieldInfo> inspectorVisibleFields)
+        public InitType(Type type, InitMethod[] initMethods,
+            Dictionary<string, FieldInfo> inspectorVisibleFields)
         {
             Type = type;
-            AutofetchMethods = autofetchMethods;
-            MainAttribute = mainAttribute;
+            InitMethods = initMethods;
             InspectorVisibleFields = inspectorVisibleFields;
         }
 
-        public static AutofetchType TryToBuildFrom(Type type)
+        public static InitType TryToBuildFrom(Type type)
         {
             if (!IsSupported(type)) return null;
-            AutofetchType autofetchType =  new(
+            InitType initType =  new(
                 type: type,
-                autofetchMethods: null,
-                mainAttribute: null,
+                initMethods: null,
                 inspectorVisibleFields: GetInpectorVisibleFieldsOf(type)
             );
-            IEnumerable<AutofetchMethod> autofetchMethods = BuildAutofetchMethodsOf(type, autofetchType);
-            if (!autofetchMethods.Any()) return null;
-            autofetchType.AutofetchMethods = autofetchMethods.ToArray();
-            autofetchType.MainAttribute = autofetchMethods.First().AutofetchAttribute;
-            return autofetchType;
+            IEnumerable<InitMethod> initMethods = BuildInitMethodsOf(type, initType);
+            if (!initMethods.Any()) return null;
+            initType.InitMethods = initMethods.ToArray();
+            return initType;
         }
 
         private static Dictionary<string, FieldInfo> GetInpectorVisibleFieldsOf(Type type)
@@ -56,21 +52,21 @@ namespace LnxArch
 
         public IEnumerable<Type> FindTypeDependencies()
         {
-            return AutofetchMethods
+            return InitMethods
                 .SelectMany(m => m.FindTypeDependencies())
                 .Distinct();
         }
 
         public override string ToString()
         {
-            return $"AutofetchType-{Type} {Priority}";
+            return $"{this.GetType().Name}-{Type} {Priority}";
         }
 
-        private static IEnumerable<AutofetchMethod> BuildAutofetchMethodsOf(Type type, AutofetchType declaringType)
+        private static IEnumerable<InitMethod> BuildInitMethodsOf(Type type, InitType declaringType)
         {
             return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
-            .Select(method => AutofetchMethod.BuildFrom(method, declaringType))
-            .Where(m => m.AutofetchAttribute != null);
+            .Select(method => InitMethod.BuildFrom(method, declaringType))
+            .Where(m => m.InitAttribute != null);
         }
     }
 }

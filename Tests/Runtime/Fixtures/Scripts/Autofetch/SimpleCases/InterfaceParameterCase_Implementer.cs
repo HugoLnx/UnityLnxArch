@@ -8,7 +8,7 @@ namespace LnxArch.TestFixtures
         [SerializeField] private bool _log;
         public Collider Collider { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(Collider collider)
         {
             Collider = collider;

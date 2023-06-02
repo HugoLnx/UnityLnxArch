@@ -8,7 +8,7 @@ namespace LnxArch.TestFixtures
         [SerializeField] protected bool _log;
         public BoxCollider BoxCollider { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void PrepareGrandfather(BoxCollider boxCollider)
         {
             BoxCollider = boxCollider;

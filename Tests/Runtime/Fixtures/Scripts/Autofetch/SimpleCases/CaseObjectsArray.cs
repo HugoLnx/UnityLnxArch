@@ -10,7 +10,7 @@ namespace LnxArch.TestFixtures
         public Collider[] Colliders { get; private set; }
         public Rigidbody[] Rigidbodies { get; private set; }
 
-        [Autofetch]
+        [LnxInit]
         public void Prepare(Collider[] colliders, Rigidbody[] rigidbodies)
         {
             Colliders = colliders;

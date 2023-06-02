@@ -16,7 +16,7 @@ namespace LnxArch
 #endregion
 
 #region Constructors
-        [Autofetch]
+        [LnxInit]
         protected void PrepareDeriverSource(
             KSource source
         )
