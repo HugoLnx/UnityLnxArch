@@ -4,7 +4,7 @@ using LnxArch.TestFixtures;
 
 namespace LnxArch.Tests
 {
-    public class Autofetch_CircularSmall
+    public class LnxInit_CircularSmallTests
     {
         #region Nested
         public struct EntityContext
@@ -25,7 +25,7 @@ namespace LnxArch.Tests
             }
         }
         #endregion
-        private static readonly FixturesLoader _fixtures = FixturesLoader.RuntimeAutofetch;
+        private static readonly FixturesLoader _fixtures = FixturesLoader.RuntimeLnxInit;
         private const string PrefabName = "CircularSmall";
         [Test]
         public void InjectsCircularDependenciesInAnyOrder()
@@ -42,7 +42,7 @@ namespace LnxArch.Tests
         }
 
         [Test]
-        public void OnlyCallsAutofetchOnce()
+        public void OnlyInitializesOnce()
         {
             var entity = _fixtures.InstantiateEntityPrefab(PrefabName);
             EntityContext ctx = EntityContext.Create(entity);

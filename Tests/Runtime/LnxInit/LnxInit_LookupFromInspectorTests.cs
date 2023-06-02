@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LnxArch.Tests
 {
-    public class Autofetch_LookupFromInspectorTests
+    public class LnxInit_LookupFromInspectorTests
     {
         #region Nested
         public struct EntityContext
@@ -34,7 +34,7 @@ namespace LnxArch.Tests
         }
         #endregion
         private const string PrefabName = "LookupFromInspector";
-        private static readonly FixturesLoader _fixtures = FixturesLoader.RuntimeAutofetch;
+        private static readonly FixturesLoader _fixtures = FixturesLoader.RuntimeLnxInit;
 
         [Test]
         public void WhenFetchingOne_InjectedByDefaultSerializableAttribute()

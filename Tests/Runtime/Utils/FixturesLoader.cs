@@ -7,7 +7,7 @@ namespace LnxArch.TestTools
     public sealed class FixturesLoader
     {
         private const string PackagePrefix = "Sensen.LnxArch";
-        public static FixturesLoader RuntimeAutofetch { get; } = new(testsGroup: "Autofetch");
+        public static FixturesLoader RuntimeLnxInit { get; } = new(testsGroup: "LnxInit");
         private readonly string _testsGroup;
         private readonly bool _isEditor;
         private string _testsFolderPath;

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LnxArch.Tests
 {
-    public class Autofetch_ObjectsArrayTests
+    public class LnxInit_ObjectsArrayTests
     {
         #region Nested
         public struct EntityContext
@@ -26,7 +26,7 @@ namespace LnxArch.Tests
             }
         }
         #endregion
-        private readonly FixturesLoader _fixtures = FixturesLoader.RuntimeAutofetch;
+        private readonly FixturesLoader _fixtures = FixturesLoader.RuntimeLnxInit;
         [Test]
         public void WhenHasMatch_ReturnsAllMatchingComponents()
         {

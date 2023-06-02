@@ -9,7 +9,7 @@ using UnityEngine.TestTools;
 
 namespace LnxArch.Tests
 {
-    public class Autofetch_AbstractParameterTests
+    public class LnxInit_AbstractParameterTests
     {
 
         #region Nested
@@ -29,7 +29,7 @@ namespace LnxArch.Tests
             }
         }
         #endregion
-        private readonly FixturesLoader _fixtures = FixturesLoader.RuntimeAutofetch;
+        private readonly FixturesLoader _fixtures = FixturesLoader.RuntimeLnxInit;
         [Test]
         public void GetDependencyByAbstractClass()
         {
