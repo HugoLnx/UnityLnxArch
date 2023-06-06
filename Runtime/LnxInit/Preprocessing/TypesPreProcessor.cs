@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace LnxArch
 {
@@ -43,7 +45,9 @@ namespace LnxArch
 
         private void PreProcessTypes()
         {
-            AutoAddRegistry autoAddRegistry = new();
+            Dictionary<Type, AutoAddTarget?> autoAddRegistry = new();
+            AutoAddExecutorFactory autoAddExecutorFactory = new();
+
             _mapInitType = new Dictionary<Type, InitType>();
             _mapServiceType = new Dictionary<Type, LnxServiceType>();
             foreach (Type type in AllTypes)
@@ -51,29 +55,58 @@ namespace LnxArch
                 InitType initType = InitType.TryToBuildFrom(type);
                 if (initType != null) _mapInitType.Add(type, initType);
                 LnxServiceType serviceType = LnxServiceType.TryToBuildFrom(type, initType);
-                if (serviceType == null)
+                LnxAutoAddAttribute autoAddAttr = LnxAutoAddAttribute.GetFrom(type);
+                bool isService = serviceType != null;
+                if (isService)
                 {
-                    // TODO: If it has LnxAutoAdd attribute add to registry
-                }
-                else
-                {
+                    if (autoAddAttr != null)
+                    {
+                        serviceType.ForceAutoAdd();
+                    }
                     _mapServiceType.Add(type, serviceType);
-                    // TODO: If it has LnxAutoAdd attribute serviceType.IsAutoAdd should be true
                     if (serviceType.IsAutoAdd)
                     {
-                        autoAddRegistry.Register(type, AutoAddType.Service);
+                        autoAddRegistry.Add(type, AutoAddTarget.Service);
                     }
                 }
+                else if (autoAddAttr != null)
+                {
+                    if (autoAddAttr.Target == AutoAddTarget.Service)
+                    {
+                        throw new InvalidAutoAddTargetException($"Type {type.Name} has LnxAutoAdd.Target=Service but it is not a LnxService.");
+                    }
+                    autoAddRegistry.Add(type, autoAddAttr.Target);
+                }
             }
-            LinkAutoAddToParams(autoAddRegistry);
+            LinkAutoAddToParams(autoAddRegistry, autoAddExecutorFactory);
         }
 
-        private void LinkAutoAddToParams(AutoAddRegistry autoAddRegistry)
+        private void LinkAutoAddToParams(Dictionary<Type, AutoAddTarget?> autoAddRegistry, AutoAddExecutorFactory executorFactory)
         {
             foreach (InitMethodParameter initParam in AllInitParameters())
             {
-                initParam.AutoAddExecutor = autoAddRegistry.Retrieve(initParam.Type);
+                AutoAddTarget? maybeTarget = LnxAutoAddAttribute.GetFrom(initParam.Info)?.Target
+                    ?? autoAddRegistry.GetValueOrDefault(initParam.Type);
+                if (!maybeTarget.HasValue) continue;
+                AutoAddTarget target = maybeTarget.Value;
+
+                bool isService = _mapServiceType.ContainsKey(initParam.Type);
+                if (!isService && target == AutoAddTarget.Service)
+                {
+                    throw new InvalidAutoAddTargetException(
+                        $"{initParam.ToHumanName()} has LnxAutoAdd.Target={target}, "
+                        + $"but type {initParam.DeclaringType.Type.Name} is a LnxService.");
+                }
+
+                initParam.AutoAddExecutor = executorFactory.ExecutorFor(target);
             }
+        }
+
+        private AutoAddExecutor ExecutorFromParameterAttribute(ParameterInfo param, AutoAddExecutorFactory factory)
+        {
+            LnxAutoAddAttribute autoAddAttr = LnxAutoAddAttribute.GetFrom(param);
+            if (autoAddAttr == null) return null;
+            return factory.ExecutorFor(autoAddAttr.Target);
         }
 
         private IEnumerable<InitMethodParameter> AllInitParameters()
@@ -88,6 +121,26 @@ namespace LnxArch
                     }
                 }
             }
+        }
+    }
+
+    [Serializable]
+    public class InvalidAutoAddTargetException : Exception
+    {
+        public InvalidAutoAddTargetException()
+        {
+        }
+
+        public InvalidAutoAddTargetException(string message) : base(message)
+        {
+        }
+
+        public InvalidAutoAddTargetException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected InvalidAutoAddTargetException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
     }
 }
