@@ -92,7 +92,11 @@ namespace LnxArch
             }
 
             bool hasFetched = fetched?.Count > 0 && fetched[0] != null;
-            if (param.IsSingleValue && !hasFetched && !param.Info.HasDefaultValue)
+            if (param.HasAutoAddExecutor && !hasFetched)
+            {
+                fetched = new List<Component> { param.AutoAddExecutor.ExecuteAt(behaviour, param.Type) };
+            }
+            else if (param.IsSingleValue && !hasFetched && !param.Info.HasDefaultValue)
             {
                 throw new LnxParameterNotFulfilledException(param);
             }

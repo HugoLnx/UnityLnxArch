@@ -6,7 +6,7 @@ namespace LnxArch
 {
     public sealed class TypesPreProcessor
     {
-        public static TypesPreProcessor Instance { get; } = new TypesPreProcessor();
+        public static TypesPreProcessor Instance { get; } = new();
         private IEnumerable<Type> _allTypes;
         private Dictionary<Type, InitType> _mapInitType;
         private Dictionary<Type, LnxServiceType> _mapServiceType;
@@ -43,6 +43,7 @@ namespace LnxArch
 
         private void PreProcessTypes()
         {
+            AutoAddRegistry autoAddRegistry = new();
             _mapInitType = new Dictionary<Type, InitType>();
             _mapServiceType = new Dictionary<Type, LnxServiceType>();
             foreach (Type type in AllTypes)
@@ -50,7 +51,42 @@ namespace LnxArch
                 InitType initType = InitType.TryToBuildFrom(type);
                 if (initType != null) _mapInitType.Add(type, initType);
                 LnxServiceType serviceType = LnxServiceType.TryToBuildFrom(type, initType);
-                if (serviceType != null) _mapServiceType.Add(type, serviceType);
+                if (serviceType == null)
+                {
+                    // TODO: If it has LnxAutoAdd attribute add to registry
+                }
+                else
+                {
+                    _mapServiceType.Add(type, serviceType);
+                    // TODO: If it has LnxAutoAdd attribute serviceType.IsAutoAdd should be true
+                    if (serviceType.IsAutoAdd)
+                    {
+                        autoAddRegistry.Register(type, AutoAddType.Service);
+                    }
+                }
+            }
+            LinkAutoAddToParams(autoAddRegistry);
+        }
+
+        private void LinkAutoAddToParams(AutoAddRegistry autoAddRegistry)
+        {
+            foreach (InitMethodParameter initParam in AllInitParameters())
+            {
+                initParam.AutoAddExecutor = autoAddRegistry.Retrieve(initParam.Type);
+            }
+        }
+
+        private IEnumerable<InitMethodParameter> AllInitParameters()
+        {
+            foreach (InitType initType in _mapInitType.Values)
+            {
+                foreach (InitMethod initMethod in initType.InitMethods)
+                {
+                    foreach (InitMethodParameter initParam in initMethod.Parameters)
+                    {
+                        yield return initParam;
+                    }
+                }
             }
         }
     }

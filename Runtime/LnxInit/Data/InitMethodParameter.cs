@@ -16,11 +16,13 @@ namespace LnxArch
         private FetchCollectionWrap CollectionWrap { get; }
         public ParameterInfo Info { get; }
         public IFetchAttribute[] FetchAttributes { get; }
+        public AutoAddExecutor AutoAddExecutor { get; set; }
 
         public bool HasListWrapping => CollectionWrap == FetchCollectionWrap.List;
         public bool HasArrayWrapping => CollectionWrap == FetchCollectionWrap.Array;
         public bool HasValidCollectionWrap => !IsSingleValue;
         public bool IsSingleValue => CollectionWrap == FetchCollectionWrap.None;
+        public bool HasAutoAddExecutor => AutoAddExecutor != null;
 
         public InitMethodParameter(Type type, Type componentType, FetchCollectionWrap collectionWrap,
         ParameterInfo parameter, IFetchAttribute[] fetchAttributes, InitType declaringType,
