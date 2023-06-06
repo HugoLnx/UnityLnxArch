@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace LnxArch
 {
     [Serializable]
-    internal class LnxComponentNotFound : Exception
+    public class LnxComponentNotFound : Exception
     {
         public LnxComponentNotFound()
         {

@@ -66,7 +66,7 @@ namespace LnxArch
         {
             return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
             .Select(method => InitMethod.BuildFrom(method, declaringType))
-            .Where(m => m.InitAttribute != null);
+            .Where(m => m?.InitAttribute != null);
         }
     }
 }

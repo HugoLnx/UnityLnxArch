@@ -7,33 +7,41 @@ using UnityEngine;
 namespace LnxArch
 {
     public enum FetchCollectionWrap { None, Array, List }
-    public readonly struct InitMethodParameter
+    public class InitMethodParameter
     {
         public Type Type { get; }
         public Type ComponentType { get; }
         public InitType DeclaringType { get; }
+        public InitMethod DeclaringMethod { get; }
         private FetchCollectionWrap CollectionWrap { get; }
         public ParameterInfo Info { get; }
         public IFetchAttribute[] FetchAttributes { get; }
 
         public bool HasListWrapping => CollectionWrap == FetchCollectionWrap.List;
         public bool HasArrayWrapping => CollectionWrap == FetchCollectionWrap.Array;
-        public bool HasValidCollectionWrap => CollectionWrap != FetchCollectionWrap.None;
+        public bool HasValidCollectionWrap => !IsSingleValue;
+        public bool IsSingleValue => CollectionWrap == FetchCollectionWrap.None;
 
-        public InitMethodParameter(Type type, Type componentType,
-            FetchCollectionWrap collectionWrap, ParameterInfo parameter,
-            IFetchAttribute[] fetchAttributes, InitType declaringType)
+        public InitMethodParameter(Type type, Type componentType, FetchCollectionWrap collectionWrap,
+        ParameterInfo parameter, IFetchAttribute[] fetchAttributes, InitType declaringType,
+        InitMethod declaringMethod)
         {
             Type = type;
             ComponentType = componentType;
             DeclaringType = declaringType;
+            DeclaringMethod = declaringMethod;
             CollectionWrap = collectionWrap;
             Info = parameter;
             FetchAttributes = fetchAttributes;
             FillInspectorGetters();
+            if (typeof(IEnumerable<>).IsAssignableFrom(Type) && !HasValidCollectionWrap)
+            {
+                throw new InvalidCollectionParameterTypeException(this);
+            }
         }
 
-        public static InitMethodParameter BuildFrom(ParameterInfo parameter, InitType declaringType)
+        public static InitMethodParameter BuildFrom(ParameterInfo parameter,
+            InitType declaringType, InitMethod declaringMethod)
         {
             FetchCollectionWrap collectionWrap = GetCollectionType(parameter.ParameterType);
             return new InitMethodParameter(
@@ -42,7 +50,8 @@ namespace LnxArch
                 collectionWrap: collectionWrap,
                 parameter: parameter,
                 fetchAttributes: GetFetchAttributesOf(parameter),
-                declaringType: declaringType
+                declaringType: declaringType,
+                declaringMethod: declaringMethod
             );
         }
 
@@ -94,6 +103,11 @@ namespace LnxArch
                 }
                 fromInspectorAttribute.InspectorGetter = inspectorGetter;
             }
+        }
+
+        public string ToHumanName()
+        {
+            return $"{DeclaringMethod.ToHumanName()}({this.Type.Name} {this.Info.Name})";
         }
 
         private static Type GetInnerTypeFrom(Type type, FetchCollectionWrap wrap)

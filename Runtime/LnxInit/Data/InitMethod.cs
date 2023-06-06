@@ -7,37 +7,45 @@ using UnityEngine.Assertions;
 
 namespace LnxArch
 {
-    public readonly struct InitMethod
+    public class InitMethod
     {
         public MethodInfo Info { get; }
         public LnxInitAttribute InitAttribute { get; }
-        public InitMethodParameter[] Parameters { get; }
+        public InitMethodParameter[] Parameters { get; private set; }
         public InitType DeclaringType { get; }
 
-        private readonly object[] _valuesBuffer;
+        private object[] _valuesBuffer;
 
         public InitMethod(MethodInfo method, LnxInitAttribute initAttribute,
-            InitMethodParameter[] parameters, InitType declaringType)
+            InitType declaringType, InitMethodParameter[] parameters = null)
         {
             Info = method;
             InitAttribute = initAttribute;
-            Parameters = parameters;
             DeclaringType = declaringType;
-            _valuesBuffer = new object[parameters.Length];
+            if (parameters != null) SetupParameters(parameters);
         }
 
         public static InitMethod BuildFrom(MethodInfo method, InitType declaringType)
         {
-            // TODO: Verify if method has generics and throw and exception if it does
-            return new InitMethod(
+            LnxInitAttribute initAttribute = method.GetCustomAttribute<LnxInitAttribute>(false);
+            if (initAttribute == null) return null;
+            InitMethod initMethod = new(
                 method: method,
-                initAttribute: method.GetCustomAttribute<LnxInitAttribute>(false),
-                parameters: method
-                    .GetParameters()
-                    .Select(param => InitMethodParameter.BuildFrom(param, declaringType))
-                    .ToArray(),
+                initAttribute: initAttribute,
                 declaringType: declaringType
             );
+            initMethod.SetupParameters(
+                method
+                .GetParameters()
+                .Select(param => InitMethodParameter.BuildFrom(param, declaringType, initMethod))
+                .ToArray()
+            );
+
+            if (method.IsGenericMethod)
+            {
+                throw new GenericInitMethodException(initMethod);
+            }
+            return initMethod;
         }
 
         public IEnumerable<Type> FindTypeDependencies()
@@ -66,6 +74,17 @@ namespace LnxArch
                 _valuesBuffer[i] = param.AdaptToBeValueOnInvokeParameter(fetchedComponents);
             }
             this.Info.Invoke(behaviour, _valuesBuffer);
+        }
+
+        public string ToHumanName()
+        {
+            return $"{DeclaringType.Type.Name}#{Info.Name}";
+        }
+
+        private void SetupParameters(InitMethodParameter[] parameters)
+        {
+            Parameters = parameters;
+            _valuesBuffer = new object[parameters.Length];
         }
     }
 }

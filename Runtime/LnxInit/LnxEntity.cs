@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace LnxArch
 {
-    [DefaultExecutionOrder (-9997)]
+    [DefaultExecutionOrder (-9995)]
     public class LnxEntity : MonoBehaviour
     {
         public bool WasInitialized { get; set; }
@@ -15,7 +15,12 @@ namespace LnxArch
 
         private void Awake()
         {
-            if (WasInitialized) return;
+            if (WasInitialized || CheckAwakePrevented()) return;
+            ForceAwake();
+        }
+
+        public void ForceAwake()
+        {
             InitService.Instance.InitEntity(this);
             WasInitialized = true;
         }
@@ -50,6 +55,11 @@ namespace LnxArch
         public Component[] FetchAll(Type type, bool includeInactive = DefaultIncludeInactive)
         {
             return GetComponentsInChildren(type, includeInactive);
+        }
+
+        private bool CheckAwakePrevented()
+        {
+            return GetComponent<LnxEntityPreventAutomaticAwake>() != null;
         }
 
         public static LnxEntity FetchEntityOf(Component component, bool canBeNull = true)
