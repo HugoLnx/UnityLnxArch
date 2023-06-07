@@ -46,7 +46,7 @@ namespace LnxArch
             _wasRegistered = true;
             if (persistentService != null && transientService != null)
             {
-                throw new LnxServiceEntityInvalidChildren(this, transientService, persistentService);
+                throw new LnxServiceEntityInvalidChildrenException(this, transientService, persistentService);
             }
             else if (persistentService != null)
             {
@@ -92,7 +92,7 @@ namespace LnxArch
             {
                 if (serviceEntity != this)
                 {
-                    throw new LnxServiceEntityNested(parent: serviceEntity, child: this);
+                    throw new LnxServiceEntityNestedException(parent: serviceEntity, child: this);
                 }
             }
         }

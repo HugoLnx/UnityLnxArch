@@ -78,7 +78,7 @@ namespace LnxArch
                 );
                 if (inspectorGetter == null)
                 {
-                    throw new CouldNotFindAttributeOrPropertyForFromInspector(
+                    throw new CouldNotFindAttributeOrPropertyForFromInspectorException(
                         declaringType: initParam.DeclaringType,
                         parameter: initParam.Info,
                         attribute: fromInspectorAttribute

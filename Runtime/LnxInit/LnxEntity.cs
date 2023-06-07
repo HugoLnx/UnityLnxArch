@@ -31,7 +31,7 @@ namespace LnxArch
             T component = GetComponentInChildren<T>(includeInactive);
             if (component == null && !canBeNull)
             {
-                throw new LnxComponentNotFound(typeof(T), this);
+                throw new LnxComponentNotFoundException(typeof(T), this);
             }
             return component;
         }
@@ -41,7 +41,7 @@ namespace LnxArch
             Component component = GetComponentInChildren(type, includeInactive);
             if (component == null && !canBeNull)
             {
-                throw new LnxComponentNotFound(type, this);
+                throw new LnxComponentNotFoundException(type, this);
             }
             return component;
         }
@@ -67,7 +67,7 @@ namespace LnxArch
             LnxEntity entity = component.GetComponentInParent<LnxEntity>(includeInactive: true);
             if (entity == null && !canBeNull)
             {
-                throw new LnxEntityNotFound(component);
+                throw new LnxEntityNotFoundException(component);
             }
             return entity;
         }

@@ -5,25 +5,25 @@ using UnityEngine;
 namespace LnxArch
 {
     [Serializable]
-    public class LnxServiceEntityInvalidChildren : Exception
+    public class LnxServiceEntityInvalidChildrenException : Exception
     {
         private readonly LnxServiceEntity _entity;
         private readonly MonoBehaviour _transientService;
         private readonly MonoBehaviour _persistentService;
 
-        public LnxServiceEntityInvalidChildren()
+        public LnxServiceEntityInvalidChildrenException()
         {
         }
 
-        public LnxServiceEntityInvalidChildren(string message) : base(message)
+        public LnxServiceEntityInvalidChildrenException(string message) : base(message)
         {
         }
 
-        public LnxServiceEntityInvalidChildren(string message, Exception innerException) : base(message, innerException)
+        public LnxServiceEntityInvalidChildrenException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
-        public LnxServiceEntityInvalidChildren(LnxServiceEntity entity, MonoBehaviour transientService, MonoBehaviour persistentService)
+        public LnxServiceEntityInvalidChildrenException(LnxServiceEntity entity, MonoBehaviour transientService, MonoBehaviour persistentService)
         : base(
             $"LnxServiceEntity {entity.gameObject.name} can NOT have both"
             + $" persistent({persistentService.gameObject.name}/{persistentService.GetType().Name})"
@@ -35,7 +35,7 @@ namespace LnxArch
             _persistentService = persistentService;
         }
 
-        protected LnxServiceEntityInvalidChildren(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected LnxServiceEntityInvalidChildrenException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }
