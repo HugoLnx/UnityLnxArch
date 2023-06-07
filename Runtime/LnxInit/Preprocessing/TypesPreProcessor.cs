@@ -47,12 +47,13 @@ namespace LnxArch
         {
             Dictionary<Type, AutoAddTarget?> autoAddRegistry = new();
             AutoAddExecutorFactory autoAddExecutorFactory = new();
+            InitTypeFactory initTypeFactory = InitTypeFactory.BuildFactoriesHierarchy();
 
             _mapInitType = new Dictionary<Type, InitType>();
             _mapServiceType = new Dictionary<Type, LnxServiceType>();
             foreach (Type type in AllTypes)
             {
-                InitType initType = InitType.TryToBuildFrom(type);
+                InitType initType = initTypeFactory.TryToBuildFrom(type);
                 if (initType != null) _mapInitType.Add(type, initType);
                 LnxServiceType serviceType = LnxServiceType.TryToBuildFrom(type, initType);
                 LnxAutoAddAttribute autoAddAttr = LnxAutoAddAttribute.GetFrom(type);

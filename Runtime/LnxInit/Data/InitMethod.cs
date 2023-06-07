@@ -12,40 +12,16 @@ namespace LnxArch
         public MethodInfo Info { get; }
         public LnxInitAttribute InitAttribute { get; }
         public InitMethodParameter[] Parameters { get; private set; }
-        public InitType DeclaringType { get; }
-
-        private object[] _valuesBuffer;
+        public InitType DeclaringType { get; set; }
+        private readonly object[] _valuesBuffer;
 
         public InitMethod(MethodInfo method, LnxInitAttribute initAttribute,
-            InitType declaringType, InitMethodParameter[] parameters = null)
+            InitMethodParameter[] parameters)
         {
             Info = method;
             InitAttribute = initAttribute;
-            DeclaringType = declaringType;
-            if (parameters != null) SetupParameters(parameters);
-        }
-
-        public static InitMethod BuildFrom(MethodInfo method, InitType declaringType)
-        {
-            LnxInitAttribute initAttribute = method.GetCustomAttribute<LnxInitAttribute>(false);
-            if (initAttribute == null) return null;
-            InitMethod initMethod = new(
-                method: method,
-                initAttribute: initAttribute,
-                declaringType: declaringType
-            );
-            initMethod.SetupParameters(
-                method
-                .GetParameters()
-                .Select(param => InitMethodParameter.BuildFrom(param, declaringType, initMethod))
-                .ToArray()
-            );
-
-            if (method.IsGenericMethod)
-            {
-                throw new GenericInitMethodException(initMethod);
-            }
-            return initMethod;
+            Parameters = parameters;
+            _valuesBuffer = new object[parameters.Length];
         }
 
         public IEnumerable<Type> FindTypeDependencies()
@@ -79,12 +55,6 @@ namespace LnxArch
         public string ToHumanName()
         {
             return $"{DeclaringType.Type.Name}#{Info.Name}";
-        }
-
-        private void SetupParameters(InitMethodParameter[] parameters)
-        {
-            Parameters = parameters;
-            _valuesBuffer = new object[parameters.Length];
         }
     }
 }
