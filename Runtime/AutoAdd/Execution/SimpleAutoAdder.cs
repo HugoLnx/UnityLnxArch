@@ -7,7 +7,11 @@ namespace LnxArch
     {
         public MonoBehaviour AddOn(GameObject owner, Type componentType)
         {
-            return (MonoBehaviour) owner.AddComponent(componentType);
+            owner.SetActive(false);
+            MonoBehaviour behaviour = (MonoBehaviour) owner.AddComponent(componentType);
+            InitService.Instance.InitBehaviour(behaviour);
+            owner.SetActive(true);
+            return behaviour;
         }
     }
 }
