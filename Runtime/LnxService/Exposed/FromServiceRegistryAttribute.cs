@@ -9,7 +9,7 @@ namespace LnxArch
     {
         public int LookupOrder { get; set; }
 
-        private ServiceEntityRegistry _registry;
+        private readonly ServiceEntityRegistry _registry;
 
         public FromServiceRegistryAttribute(int order = 0)
         {

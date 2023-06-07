@@ -62,7 +62,7 @@ namespace LnxArch
             }
             else
             {
-                return new IFetchAttribute[] { new FromEntityAttribute() };
+                return Array.Empty<IFetchAttribute>();
             }
         }
 
