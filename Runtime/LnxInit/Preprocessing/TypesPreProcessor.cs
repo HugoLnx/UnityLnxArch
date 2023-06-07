@@ -80,6 +80,7 @@ namespace LnxArch
                 }
             }
             LinkAutoAddToParams(autoAddRegistry, autoAddExecutorFactory);
+            ValidatePersistentServiceDependencies();
         }
 
         private void LinkAutoAddToParams(Dictionary<Type, AutoAddTarget?> autoAddRegistry, AutoAddExecutorFactory executorFactory)
@@ -123,13 +124,41 @@ namespace LnxArch
         {
             foreach (InitType initType in _mapInitType.Values)
             {
-                foreach (InitMethod initMethod in initType.InitMethods)
+                foreach (InitMethodParameter initParam in AllInitParametersOf(initType))
                 {
-                    foreach (InitMethodParameter initParam in initMethod.Parameters)
-                    {
-                        yield return initParam;
-                    }
+                    yield return initParam;
                 }
+            }
+        }
+        private IEnumerable<InitMethodParameter> AllInitParametersOf(InitType initType)
+        {
+            foreach (InitMethod initMethod in initType.InitMethods)
+            {
+                foreach (InitMethodParameter initParam in initMethod.Parameters)
+                {
+                    yield return initParam;
+                }
+            }
+        }
+
+        private void ValidatePersistentServiceDependencies()
+        {
+            foreach (LnxServiceType serviceType in _mapServiceType.Values)
+            {
+                if (!serviceType.IsPersistent) continue;
+                ValidateIfParametersCanBelongToPersistentService(AllInitParametersOf(serviceType.InitType));
+            }
+        }
+
+        private void ValidateIfParametersCanBelongToPersistentService(IEnumerable<InitMethodParameter> initParams)
+        {
+            foreach (InitMethodParameter initParam in initParams)
+            {
+                LnxServiceType serviceType = _mapServiceType.GetValueOrDefault(initParam.Type);
+                if (serviceType == null) continue;
+                if (serviceType.IsPersistent) continue;
+
+                throw new InvalidDepedencyForPersistentServiceException(initParam);
             }
         }
     }
