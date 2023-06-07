@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 
 namespace LnxArch
 {
@@ -160,26 +159,6 @@ namespace LnxArch
 
                 throw new InvalidDepedencyForPersistentServiceException(initParam);
             }
-        }
-    }
-
-    [Serializable]
-    public class InvalidAutoAddTargetException : Exception
-    {
-        public InvalidAutoAddTargetException()
-        {
-        }
-
-        public InvalidAutoAddTargetException(string message) : base(message)
-        {
-        }
-
-        public InvalidAutoAddTargetException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected InvalidAutoAddTargetException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
         }
     }
 }
