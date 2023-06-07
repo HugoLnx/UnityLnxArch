@@ -5,31 +5,31 @@ using UnityEngine;
 namespace LnxArch
 {
     [Serializable]
-    public class LnxEntityNotFound : Exception
+    public class LnxEntityNotFoundException : Exception
     {
-        public LnxEntityNotFound()
+        public LnxEntityNotFoundException()
         {
         }
 
-        public LnxEntityNotFound(GameObject gameObject)
+        public LnxEntityNotFoundException(GameObject gameObject)
         : base(MessageFor(gameObject))
         {
         }
 
-        public LnxEntityNotFound(Component component)
+        public LnxEntityNotFoundException(Component component)
         : base(MessageFor(component))
         {
         }
 
-        public LnxEntityNotFound(string message) : base(message)
+        public LnxEntityNotFoundException(string message) : base(message)
         {
         }
 
-        public LnxEntityNotFound(string message, Exception innerException) : base(message, innerException)
+        public LnxEntityNotFoundException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
-        protected LnxEntityNotFound(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected LnxEntityNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
 

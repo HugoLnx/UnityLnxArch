@@ -22,27 +22,6 @@ namespace LnxArch
             InspectorVisibleFields = inspectorVisibleFields;
         }
 
-        public static InitType TryToBuildFrom(Type type)
-        {
-            if (!IsSupported(type)) return null;
-            InitType initType =  new(
-                type: type,
-                initMethods: null,
-                inspectorVisibleFields: GetInpectorVisibleFieldsOf(type)
-            );
-            IEnumerable<InitMethod> initMethods = BuildInitMethodsOf(type, initType);
-            if (!initMethods.Any()) return null;
-            initType.InitMethods = initMethods.ToArray();
-            return initType;
-        }
-
-        private static Dictionary<string, FieldInfo> GetInpectorVisibleFieldsOf(Type type)
-        {
-            return type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
-                    .Where(f => f.IsPublic || f.GetCustomAttribute<SerializeField>() != null)
-                    .ToDictionary(f => f.Name);
-        }
-
         public static bool IsSupported(Type type)
         {
             return type.IsClass
@@ -60,13 +39,6 @@ namespace LnxArch
         public override string ToString()
         {
             return $"{this.GetType().Name}-{Type} {Priority}";
-        }
-
-        private static IEnumerable<InitMethod> BuildInitMethodsOf(Type type, InitType declaringType)
-        {
-            return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
-            .Select(method => InitMethod.BuildFrom(method, declaringType))
-            .Where(m => m.InitAttribute != null);
         }
     }
 }

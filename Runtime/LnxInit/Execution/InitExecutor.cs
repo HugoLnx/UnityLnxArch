@@ -28,35 +28,26 @@ namespace LnxArch
         public void ExecuteInitMethodsOn(MonoBehaviour behaviour, bool force = false)
         {
             Assert.IsNotNull(behaviour);
-            if (_initialized.Contains(behaviour) && !force)
-            {
-                return;
-            }
+            if (_initialized.Contains(behaviour) && !force) return;
 
-            InitType type = _typesPreProcessor.GetInitTypeOf(behaviour.GetType());
-            if (type == null)
-            {
-                return;
-            }
-
-            LnxEntity entity = LnxBehaviour.GetLnxEntity(behaviour);
-            Assert.IsNotNull(entity, "Behaviours with LnxInit methods must be inside an LnxEntity");
+            InitType type = null;
+            LnxEntity entity = null;
+            GetInitTypeAndEntity(behaviour, ref type, ref entity);
+            if (type == null) return;
 
             TraverseTreeInitializingDependenciesFirst(behaviour, type, entity);
         }
 
-        private void TraverseTreeInitializingDependenciesFirst(Component component, InitType type = null, LnxEntity entity = null)
+        private void TraverseTreeInitializingDependenciesFirst(Component component, InitType initType = null, LnxEntity entity = null)
         {
             MonoBehaviour behaviour = component as MonoBehaviour;
-            if (behaviour == null || _initialized.Contains(behaviour))
-            {
-                return;
-            }
+            if (behaviour == null || _initialized.Contains(behaviour)) return;
+
+            GetInitTypeAndEntity(behaviour, ref initType, ref entity);
+            if (initType == null) return;
 
             _initialized.Add(behaviour);
-            type ??= _typesPreProcessor.GetInitTypeOf(behaviour.GetType());
-            entity ??= LnxBehaviour.GetLnxEntity(behaviour);
-            foreach (InitMethod method in type.InitMethods)
+            foreach (InitMethod method in initType.InitMethods)
             {
                 List<Component>[] values = FetchDependenciesOf(method, behaviour, entity);
                 foreach (Component dependency in Flatten(values))
@@ -67,7 +58,19 @@ namespace LnxArch
             }
         }
 
-        private static List<Component>[] FetchDependenciesOf(InitMethod method, MonoBehaviour behaviour, LnxEntity entity)
+        private void GetInitTypeAndEntity(MonoBehaviour behaviour, ref InitType type, ref LnxEntity entity)
+        {
+            type ??= _typesPreProcessor.GetInitTypeOf(behaviour.GetType());
+            if (type == null) return;
+
+            entity ??= LnxBehaviour.GetLnxEntity(behaviour);
+            if (entity == null)
+            {
+                throw new BehaviourWithoutEntityException(behaviour);
+            }
+        }
+
+        private List<Component>[] FetchDependenciesOf(InitMethod method, MonoBehaviour behaviour, LnxEntity entity)
         {
             List<Component>[] values = new List<Component>[method.Parameters.Length];
             for (int i = 0; i < method.Parameters.Length; i++)
@@ -79,27 +82,43 @@ namespace LnxArch
             return values;
         }
 
-        private static List<Component> FetchParameter(InitMethodParameter param, InitMethod method, MonoBehaviour behaviour, LnxEntity entity)
+        private List<Component> FetchParameter(InitMethodParameter param, InitMethod method, MonoBehaviour behaviour, LnxEntity entity)
         {
-            List<Component> fetched = null;
-            foreach (IFetchAttribute fetchAttribute in param.FetchAttributes)
-            {
-                fetched = FetchDependencyWith(fetchAttribute, param, behaviour, entity);
-                if (fetched.Count > 0 && fetched[0] != null) break;
-            }
+            List<Component> fetched = param.FetchAttributes.Any()
+                ? TryFetchWithAttributesInOrder(param, behaviour, entity)
+                : TryFetchWithDefaultAttribute(param, behaviour, entity);
 
-            // Debug.Log($"[Fetched:{behaviour.GetType().Name}] {param.Type.Name} {param.Info.Name} = {fetched?.GetType()}");
-            if (!param.Info.HasDefaultValue)
+            bool hasFetched = fetched?.Count > 0 && fetched[0] != null;
+            if (param.HasAutoAddExecutor && !hasFetched)
             {
-                string errorPrefix = $"[LnxArch:LnxInit:{behaviour.GetType().Name}#{method.Info.Name}({param.Type.Name} {param.Info.Name})]";
-                Assert.IsTrue(
-                    !typeof(IEnumerable<>).IsAssignableFrom(param.Type)
-                    || param.HasValidCollectionWrap,
-                    $"{errorPrefix} Only types derived from Component, Component[] or List<Component> can be auto fetched.");
-                Assert.IsNotNull(fetched,
-                    $"{errorPrefix} Could not fulfill that dependency");
+                fetched = new List<Component> { param.AutoAddExecutor.ExecuteAt(behaviour, param.Type) };
+            }
+            else if (param.IsSingleValue && !hasFetched && !param.Info.HasDefaultValue)
+            {
+                throw new LnxParameterNotFulfilledException(param);
             }
             return fetched;
+        }
+
+        private static List<Component> TryFetchWithAttributesInOrder(InitMethodParameter param, MonoBehaviour behaviour, LnxEntity entity)
+        {
+            foreach (IFetchAttribute fetchAttribute in param.FetchAttributes)
+            {
+                List<Component> fetched = FetchDependencyWith(fetchAttribute, param, behaviour, entity);
+                if (fetched.Count > 0 && fetched[0] != null)
+                {
+                    return fetched;
+                }
+            }
+            return new List<Component>();
+        }
+
+        private List<Component> TryFetchWithDefaultAttribute(InitMethodParameter param, MonoBehaviour behaviour, LnxEntity entity)
+        {
+            IFetchAttribute defaultFetchAttribute = _typesPreProcessor.IsServiceType(param.Type)
+                ? new FromServiceRegistryAttribute()
+                : new FromEntityAttribute();
+            return FetchDependencyWith(defaultFetchAttribute, param, behaviour, entity);
         }
 
         private static List<Component> FetchDependencyWith(IFetchAttribute fetchAttribute, InitMethodParameter param, MonoBehaviour behaviour, LnxEntity entity)

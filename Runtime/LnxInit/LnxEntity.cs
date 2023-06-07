@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace LnxArch
 {
-    [DefaultExecutionOrder (-9997)]
+    [DefaultExecutionOrder (-9995)]
     public class LnxEntity : MonoBehaviour
     {
         public bool WasInitialized { get; set; }
@@ -15,7 +15,12 @@ namespace LnxArch
 
         private void Awake()
         {
-            if (WasInitialized) return;
+            if (WasInitialized || CheckAwakePrevented()) return;
+            ForceAwake();
+        }
+
+        public void ForceAwake()
+        {
             InitService.Instance.InitEntity(this);
             WasInitialized = true;
         }
@@ -26,7 +31,7 @@ namespace LnxArch
             T component = GetComponentInChildren<T>(includeInactive);
             if (component == null && !canBeNull)
             {
-                throw new LnxComponentNotFound(typeof(T), this);
+                throw new LnxComponentNotFoundException(typeof(T), this);
             }
             return component;
         }
@@ -36,7 +41,7 @@ namespace LnxArch
             Component component = GetComponentInChildren(type, includeInactive);
             if (component == null && !canBeNull)
             {
-                throw new LnxComponentNotFound(type, this);
+                throw new LnxComponentNotFoundException(type, this);
             }
             return component;
         }
@@ -52,12 +57,17 @@ namespace LnxArch
             return GetComponentsInChildren(type, includeInactive);
         }
 
+        private bool CheckAwakePrevented()
+        {
+            return GetComponent<LnxEntityPreventAutomaticAwake>() != null;
+        }
+
         public static LnxEntity FetchEntityOf(Component component, bool canBeNull = true)
         {
             LnxEntity entity = component.GetComponentInParent<LnxEntity>(includeInactive: true);
             if (entity == null && !canBeNull)
             {
-                throw new LnxEntityNotFound(component);
+                throw new LnxEntityNotFoundException(component);
             }
             return entity;
         }

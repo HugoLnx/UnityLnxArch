@@ -7,37 +7,21 @@ using UnityEngine.Assertions;
 
 namespace LnxArch
 {
-    public readonly struct InitMethod
+    public class InitMethod
     {
         public MethodInfo Info { get; }
         public LnxInitAttribute InitAttribute { get; }
-        public InitMethodParameter[] Parameters { get; }
-        public InitType DeclaringType { get; }
-
+        public InitMethodParameter[] Parameters { get; private set; }
+        public InitType DeclaringType { get; set; }
         private readonly object[] _valuesBuffer;
 
         public InitMethod(MethodInfo method, LnxInitAttribute initAttribute,
-            InitMethodParameter[] parameters, InitType declaringType)
+            InitMethodParameter[] parameters)
         {
             Info = method;
             InitAttribute = initAttribute;
             Parameters = parameters;
-            DeclaringType = declaringType;
             _valuesBuffer = new object[parameters.Length];
-        }
-
-        public static InitMethod BuildFrom(MethodInfo method, InitType declaringType)
-        {
-            // TODO: Verify if method has generics and throw and exception if it does
-            return new InitMethod(
-                method: method,
-                initAttribute: method.GetCustomAttribute<LnxInitAttribute>(false),
-                parameters: method
-                    .GetParameters()
-                    .Select(param => InitMethodParameter.BuildFrom(param, declaringType))
-                    .ToArray(),
-                declaringType: declaringType
-            );
         }
 
         public IEnumerable<Type> FindTypeDependencies()
@@ -66,6 +50,11 @@ namespace LnxArch
                 _valuesBuffer[i] = param.AdaptToBeValueOnInvokeParameter(fetchedComponents);
             }
             this.Info.Invoke(behaviour, _valuesBuffer);
+        }
+
+        public string ToHumanName()
+        {
+            return $"{DeclaringType.Type.Name}#{Info.Name}";
         }
     }
 }
