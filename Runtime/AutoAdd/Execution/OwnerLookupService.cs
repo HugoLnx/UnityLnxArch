@@ -7,7 +7,7 @@ namespace LnxArch
     {
         public GameObject Fetch(MonoBehaviour _, Type componentType)
         {
-            return new($"{componentType.Name} [LnxService - AutoInstantiated]");
+            return new($"{componentType.Name} [LnxService - AutoAdd]");
         }
     }
 }
