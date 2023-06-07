@@ -6,7 +6,7 @@ namespace LnxArch
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter)]
     public class LnxAutoAddAttribute : Attribute
     {
-        public AutoAddTarget Target { get; set; } = AutoAddTarget.Local;
+        public AutoAddTarget Target { get; set; } = AutoAddTarget.Entity;
 
         public static LnxAutoAddAttribute GetFrom(Type type)
         {
