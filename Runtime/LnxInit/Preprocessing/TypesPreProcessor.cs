@@ -144,7 +144,7 @@ namespace LnxArch
         {
             foreach (LnxServiceType serviceType in _mapServiceType.Values)
             {
-                if (!serviceType.IsPersistent) continue;
+                if (!serviceType.IsPersistent || !serviceType.HasInitMethods) continue;
                 ValidateIfParametersCanBelongToPersistentService(AllInitParametersOf(serviceType.InitType));
             }
         }
