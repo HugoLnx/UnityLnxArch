@@ -86,12 +86,21 @@ namespace LnxArch
         {
             foreach (InitMethodParameter initParam in AllInitParameters())
             {
+                bool isService = _mapServiceType.ContainsKey(initParam.Type);
                 AutoAddTarget? maybeTarget = LnxAutoAddAttribute.GetFrom(initParam.Info)?.Target
                     ?? autoAddRegistry.GetValueOrDefault(initParam.Type);
-                if (!maybeTarget.HasValue) continue;
+                if (!maybeTarget.HasValue)
+                {
+                    if (isService && !initParam.Info.HasDefaultValue)
+                    {
+                        throw new LnxServiceMandatoryParameterException(
+                            $"{initParam.ToHumanName()}: LnxService parameters with AutoAdd disabled need default value."
+                            + $" Consider changing it to {initParam.Type.Name} {initParam.Info.Name} = null");
+                    }
+                    continue;
+                }
                 AutoAddTarget target = maybeTarget.Value;
 
-                bool isService = _mapServiceType.ContainsKey(initParam.Type);
                 if (!isService && target == AutoAddTarget.Service)
                 {
                     throw new InvalidAutoAddTargetException(
