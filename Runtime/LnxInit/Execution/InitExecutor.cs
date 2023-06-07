@@ -63,7 +63,7 @@ namespace LnxArch
             type ??= _typesPreProcessor.GetInitTypeOf(behaviour.GetType());
             if (type == null) return;
 
-            entity ??= LnxBehaviour.GetLnxEntity(behaviour);
+            entity ??= LnxEntity.FetchEntityOf(behaviour);
             if (entity == null)
             {
                 throw new BehaviourWithoutEntityException(behaviour);

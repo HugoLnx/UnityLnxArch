@@ -14,7 +14,7 @@ namespace LnxArch
         }
 
         public BehaviourWithoutEntityException(MonoBehaviour behaviour)
-        : base($"Behaviour {behaviour.gameObject.name}/{behaviour.GetType().Name} must be inside a LnxEntity or LnxServiceEntity because it has InitMethods.")
+        : base($"{behaviour.gameObject.name}/{behaviour.GetType().Name} must be inside a LnxEntity to have InitMethods.")
         {
             this.behaviour = behaviour;
         }
