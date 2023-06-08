@@ -3,7 +3,7 @@ using static LnxArch.ComponentUtility;
 
 namespace LnxArch
 {
-    [DefaultExecutionOrder (-9996)]
+    [DefaultExecutionOrder (ExecutionOrderConfig.LnxServiceEntity)]
     public class LnxServiceEntity : MonoBehaviour
     {
         private static readonly TypesPreProcessor s_types = TypesPreProcessor.Instance;

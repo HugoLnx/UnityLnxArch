@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LnxArch
 {
-    [DefaultExecutionOrder (-9997)]
+    [DefaultExecutionOrder (ExecutionOrderConfig.LnxEntityLink)]
     public class LnxEntityLink : MonoBehaviour
     {
         private static readonly ObjectLinkEvent[] s_whenEntityAffectsTarget = new ObjectLinkEvent[]

@@ -8,7 +8,7 @@ using static LnxArch.ComponentUtility;
 
 namespace LnxArch
 {
-    [DefaultExecutionOrder (-9995)]
+    [DefaultExecutionOrder (ExecutionOrderConfig.LnxEntity)]
     public class LnxEntity : MonoBehaviour
     {
         public bool WasInitialized { get; set; }
