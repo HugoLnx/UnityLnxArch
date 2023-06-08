@@ -16,12 +16,12 @@ namespace LnxArch
 
         public Component FetchOne(FetchContext ctx)
         {
-            LnxEntity parentEntity = ctx.Entity.transform.parent.GetComponentInParent<LnxEntity>(includeInactive: true);
+            LnxEntity parentEntity = LnxEntity.FetchEntityParentOf(ctx.Entity);
             return parentEntity.FetchFirst(ctx.Type);
         }
         public IEnumerable<Component> FetchMany(FetchContext ctx)
         {
-            LnxEntity parentEntity = ctx.Entity.transform.parent.GetComponentInParent<LnxEntity>(includeInactive: true);
+            LnxEntity parentEntity = LnxEntity.FetchEntityParentOf(ctx.Entity);
             return parentEntity.FetchAll(ctx.Type);
         }
     }
