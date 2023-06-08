@@ -1,4 +1,5 @@
 using UnityEngine;
+using static LnxArch.ComponentUtility;
 
 namespace LnxArch
 {
@@ -95,16 +96,6 @@ namespace LnxArch
                     throw new LnxServiceEntityNestedException(parent: serviceEntity, child: this);
                 }
             }
-        }
-
-        private static T EnsureComponent<T>(GameObject obj)
-        where T : Component
-        {
-            if (!obj.TryGetComponent<T>(out T component))
-            {
-                component = obj.AddComponent<T>();
-            }
-            return component;
         }
     }
 }

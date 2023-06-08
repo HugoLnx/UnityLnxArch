@@ -1,4 +1,5 @@
 using UnityEngine;
+using static LnxArch.ComponentUtility;
 
 namespace LnxArch
 {
@@ -25,12 +26,6 @@ namespace LnxArch
         public void Unlink()
         {
             TriggerEventObservable.Callbacks -= PerformLinking;
-        }
-
-        private static T EnsureComponent<T>(GameObject gameObject)
-        where T : Component
-        {
-            return gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
         }
     }
 }
