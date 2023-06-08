@@ -10,7 +10,7 @@ namespace LnxArch
 
         protected override void PerformLinking()
         {
-            _target.SetActive(false);
+            GameObject.Destroy(_target);
         }
     }
 }
