@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LnxArch
 {
-    public class OnDisableObservable : MonoBehaviour
+    public class OnDisableObservable : MonoBehaviour, ISimpleObservable
     {
         public event Action Callbacks;
 
