@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace LnxArch
 {
-    public class OnDisableObservable : MonoBehaviour, ISimpleObservable
+    public class OnDestroyObservable : MonoBehaviour, ISimpleObservable
     {
         public event Action Callbacks;
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             Callbacks?.Invoke();
         }

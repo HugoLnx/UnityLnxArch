@@ -25,21 +25,17 @@ namespace LnxArch
             SetChildEntitiesAsInitialized(entity);
         }
 
-        private void InitChildComponents(Component component)
+        private void InitChildComponents(LnxEntity entity)
         {
-            IEnumerable<MonoBehaviour> behaviours = component
-                .GetComponentsInChildren<MonoBehaviour>(includeInactive: true);
-
-            foreach (MonoBehaviour behaviour in behaviours)
+            foreach (MonoBehaviour behaviour in entity.FetchAll<MonoBehaviour>(includeInactive: true))
             {
                 InitBehaviour(behaviour);
             }
         }
 
-        private void SetChildEntitiesAsInitialized(Component component)
+        private void SetChildEntitiesAsInitialized(LnxEntity entity)
         {
-            IEnumerable<LnxEntity> childEntities = component
-                .GetComponentsInChildren<LnxEntity>(includeInactive: true);
+            IEnumerable<LnxEntity> childEntities = entity.FetchAll<LnxEntity>(includeInactive: true);
             foreach (LnxEntity childEntity in childEntities)
             {
                 childEntity.WasInitialized = true;

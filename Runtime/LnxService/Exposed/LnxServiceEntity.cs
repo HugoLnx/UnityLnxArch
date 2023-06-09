@@ -1,8 +1,9 @@
 using UnityEngine;
+using static LnxArch.ComponentUtility;
 
 namespace LnxArch
 {
-    [DefaultExecutionOrder (-9996)]
+    [DefaultExecutionOrder (ExecutionOrderConfig.LnxServiceEntity)]
     public class LnxServiceEntity : MonoBehaviour
     {
         private static readonly TypesPreProcessor s_types = TypesPreProcessor.Instance;
@@ -95,16 +96,6 @@ namespace LnxArch
                     throw new LnxServiceEntityNestedException(parent: serviceEntity, child: this);
                 }
             }
-        }
-
-        private static T EnsureComponent<T>(GameObject obj)
-        where T : Component
-        {
-            if (!obj.TryGetComponent<T>(out T component))
-            {
-                component = obj.AddComponent<T>();
-            }
-            return component;
         }
     }
 }
