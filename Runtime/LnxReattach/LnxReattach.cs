@@ -74,6 +74,7 @@ namespace LnxArch
 
         private void LinkWithEntity()
         {
+            if (_entity.gameObject == this.gameObject) return;
             _entityLink = EnsureComponent<LnxEntityLinkManual>(gameObject);
             _entityLink.ManualAwake(
                 entity: _entity,
