@@ -8,7 +8,7 @@ namespace LnxArch
     [DefaultExecutionOrder (ExecutionOrderConfig.LnxEntityLink)]
     public class LnxEntityLink : MonoBehaviour
     {
-        private static readonly ObjectLinkEvent[] s_whenEntityAffectsTarget = new ObjectLinkEvent[]
+        public static readonly List<ObjectLinkEvent> AllEvents = new()
         {
             ObjectLinkEvent.Enable,
             ObjectLinkEvent.Disable,
@@ -40,7 +40,7 @@ namespace LnxArch
 
         public void EnforceLinks()
         {
-            EnforceEntityAffectsTargetOn(s_whenEntityAffectsTarget);
+            EnforceEntityAffectsTargetOn(AllEvents);
             EnforceTargetAffectsEntityOn(_whenTargetAffectsEntity);
         }
 

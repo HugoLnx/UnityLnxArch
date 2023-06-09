@@ -11,6 +11,7 @@ namespace LnxArch
     [DefaultExecutionOrder (ExecutionOrderConfig.LnxEntity)]
     public class LnxEntity : MonoBehaviour
     {
+        [SerializeField] private Transform _root;
         public bool WasInitialized { get; set; }
         private const bool DefaultIncludeInactive = true;
         private readonly List<LnxEntityFetchExtension> _fetchExtensions = new();
@@ -24,8 +25,25 @@ namespace LnxArch
 
         internal void ForceAwake()
         {
+            if (_root == null) _root = transform;
             InitService.Instance.InitEntity(this);
+            SwapBodyWithRoot();
             WasInitialized = true;
+        }
+
+        private void SwapBodyWithRoot()
+        {
+            if (_root == transform) return;
+            int rootSiblingInx = _root.GetSiblingIndex();
+            transform.SetParent(_root.parent);
+            _root.SetParent(null);
+            transform.SetSiblingIndex(rootSiblingInx);
+            var entityLink = _root.gameObject.AddComponent<LnxEntityLinkManual>();
+            entityLink.ManualAwake(
+                entity: this,
+                whenTargetAffectsEntity: LnxEntityLink.AllEvents,
+                extendEntityFetching: true
+            );
         }
 
         public T FetchFirst<T>(bool includeInactive = DefaultIncludeInactive, bool canBeNull = true)
