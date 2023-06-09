@@ -14,26 +14,27 @@ namespace LnxArch
             ObjectLinkEvent.Disable,
             ObjectLinkEvent.Destroy
         };
-        [SerializeField] public LnxEntity _entity;
-        [SerializeField] private List<ObjectLinkEvent> _whenTargetAffectsEntity;
-        [SerializeField] private bool _extendEntityFetching = true;
+        [SerializeField] protected LnxEntity _entity;
+        [SerializeField] protected List<ObjectLinkEvent> _whenTargetAffectsEntity;
+        [SerializeField] protected bool _extendEntityFetching = true;
+        protected virtual bool IsManuallyAwaken => false;
         private LnxObjectLinkService _service;
 
         private GameObject Target => gameObject;
 
-        private void Awake()
+        protected virtual void Awake()
+        {
+            if (IsManuallyAwaken) return;
+            Boot();
+        }
+
+        protected void Boot()
         {
             _service = new LnxObjectLinkService(_entity.gameObject, Target);
             if (_extendEntityFetching && !_entity.Contains(this))
             {
                 _entity.AddFetchExtension(Target);
             }
-            EnforceLinks();
-        }
-
-        public void SetWhenTargetAffectsEntityAndEnforceLinks(List<ObjectLinkEvent> linkEvents)
-        {
-            _whenTargetAffectsEntity = linkEvents;
             EnforceLinks();
         }
 
