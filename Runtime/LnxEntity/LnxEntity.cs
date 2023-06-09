@@ -84,6 +84,29 @@ namespace LnxArch
             _fetchExtensions.Add(fetchExtension);
         }
 
+        public bool Contains(Component component)
+        {
+            LnxEntity entity = FetchEntityOf(component);
+            while (entity != null)
+            {
+                if (entity == this) return true;
+                entity = FetchEntityParentOf(entity);
+            }
+            return false;
+        }
+
+        private static LnxEntity[] FetchAncestorEntitiesOf(Component component)
+        {
+            List<LnxEntity> entities = new();
+            LnxEntity entity = FetchEntityOf(component);
+            while (entity != null)
+            {
+                entities.Add(entity);
+                entity = FetchEntityParentOf(entity);
+            }
+            return entities.ToArray();
+        }
+
         public static LnxEntity FetchEntityOf(Component component, bool canBeNull = true)
         {
             LnxEntity entity = component.GetComponentInParent<LnxEntity>(includeInactive: true)
