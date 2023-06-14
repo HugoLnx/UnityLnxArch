@@ -26,8 +26,8 @@ namespace LnxArch
         internal void ForceAwake()
         {
             if (_root == null) _root = transform;
-            InitService.Instance.InitEntity(this);
             SwapBodyWithRoot();
+            InitService.Instance.InitEntity(this);
             WasInitialized = true;
         }
 
