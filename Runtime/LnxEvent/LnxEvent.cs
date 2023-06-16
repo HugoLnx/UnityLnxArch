@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace LnxArch
 {
-    [LnxService]
+    [LnxAutoAdd]
     public abstract class LnxEvent<TEvent, TArgs> : MonoBehaviour
     where TEvent : LnxEvent<TEvent, TArgs>
     {
