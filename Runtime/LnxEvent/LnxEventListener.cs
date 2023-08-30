@@ -13,20 +13,20 @@ namespace LnxArch
         [LnxInit]
         protected void Init(TEvent lnxEvent)
         {
-            Debug.Log($"[LnxEventListener] Init {this} with {lnxEvent}");
+            // Debug.Log($"[LnxEventListener] Init {this} with {lnxEvent}");
             _event = lnxEvent;
             _event.Subscribe(this);
         }
 
         private void OnEnable()
         {
-            Debug.Log($"[OnEnable] Subscribing {this} to {_event}");
+            // Debug.Log($"[OnEnable] Subscribing {this} to {_event}");
             _event.Subscribe(this);
         }
 
         private void OnDisable()
         {
-            Debug.Log($"[OnDisable] Unsubscribing {this} from {_event}");
+            // Debug.Log($"[OnDisable] Unsubscribing {this} from {_event}");
             _event.Unsubscribe(this);
         }
 
